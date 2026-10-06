@@ -1,92 +1,41 @@
-# Levik VPN для Android
+# Hello Kitty VPN
 
-<p align="center">
-  <img src="https://leviknet.com/assets/levik-logo.png" alt="Логотип Levik VPN" width="160" height="160" />
-</p>
+Бесплатный Android VPN-клиент на Kotlin/Compose, основанный на открытом исходном коде Nort321/levik-vpn. Приложение использует собственный пакет `org.hellokittyvpn.android`, без прежних аккаунтов, оплаты, поддержки и API.
 
-<p align="center">
-  Удобный VPN-клиент для Android с обычными и мобильными VPN-серверами.<br />
-  Исходный код приложения открыт для независимого изучения и аудита.
-</p>
+Текущий этап: технический план и очистка клиента. Бэкэнд и новые VPN-узлы не развёрнуты; для подключения нужна собственная локальная конфигурация VPN. Direct relay находится на стадии подготовки и полевых испытаний.
 
-<p align="center">
-  <a href="https://leviknet.com/downloads">Скачать APK</a> ·
-  <a href="https://github.com/Nort321/levik-vpn/releases/latest">Последний релиз</a> ·
-  <a href="https://leviknet.com">Официальный сайт</a> ·
-  <a href="https://t.me/leviksupportbot">Поддержка</a>
-</p>
+- [План реализации](docs/hellokitty/implementation-plan.md)
+- [Этапы и задания команде агентов](docs/hellokitty/agent-plan/README.md)
+- [Исследование пользовательских проблем](docs/hellokitty/research-cases.md)
+- [Аудит исходной базы и сервера](docs/hellokitty/baseline-audit.md)
+- [Изменения и проверка клиента](docs/hellokitty/app-cleanup.md)
 
-<p align="center">
-  <a href="https://github.com/Nort321/levik-vpn/actions/workflows/android-ci.yml">
-    <img src="https://github.com/Nort321/levik-vpn/actions/workflows/android-ci.yml/badge.svg" alt="Android CI" />
-  </a>
-  <a href="LICENSE">
-    <img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="Лицензия AGPL-3.0" />
-  </a>
-</p>
+## Сборка
 
-## Обычный и мобильный VPN
+Требуются Java 17 и Android SDK 36. Зависимости закреплены lockfiles и strict verification metadata.
 
-В приложении доступны два понятных варианта подключения:
-
-- **Обычный VPN** — для домашнего интернета, Wi-Fi и повседневного использования;
-- **Мобильный VPN** — отдельный режим для мобильных сетей LTE/4G.
-
-Оба варианта доступны в одном приложении и отображаются раздельно, чтобы нужный режим можно было быстро найти и выбрать.
-
-## Возможности приложения
-
-- Подключение и отключение VPN одной кнопкой.
-- Автоматический выбор сервера с минимальным пингом.
-- Обычные и мобильные LTE-серверы, поиск, фильтры и избранное.
-- Бесплатный пробный доступ для обычной сети без регистрации.
-- Пробный LTE-доступ после подтверждения через Telegram.
-- Автоподключение после перезагрузки устройства и в незнакомых Wi-Fi-сетях.
-- Раздельное туннелирование для выбранных приложений.
-- Временная пауза VPN с автоматическим возобновлением.
-- Скорость, объём трафика и длительность подключения в реальном времени.
-- Бесплатный встроенный Telegram-прокси.
-- Русский и английский интерфейсы.
-- Поддержка телефонов, планшетов и Android TV.
-- Отсутствие рекламы в Android-приложении.
-
-## Установка
-
-- Требуется **Android 8.0 или новее**.
-- Root-права не нужны.
-- Актуальный APK доступен на [странице загрузки](https://leviknet.com/downloads) и в [GitHub Releases](https://github.com/Nort321/levik-vpn/releases/latest).
-
-Для обновления ранней тестовой версии `1.9.0`, подписанной другим ключом, может потребоваться удалить старую версию перед установкой актуального APK. При удалении могут сброситься локальные настройки приложения.
-
-## Открытый исходный код
-
-Этот репозиторий содержит исходный код Android-клиента Levik VPN. Он опубликован для прозрачности: любой желающий может изучить клиентскую сетевую логику, работу VPN-сервиса, хранение данных и проверки обновлений.
-
-В репозиторий не входят серверная часть, сайт, Telegram-бот, базы данных, производственные конфигурации и пользовательские данные.
-
-Основные каталоги:
-
-```text
-levik_vpn_android/app/src/main/   исходный код и ресурсы приложения
-levik_vpn_android/app/src/test/   модульные тесты
-docs/architecture.md              обзор архитектуры клиента
-docs/security-model.md            модель безопасности
+```bash
+bash scripts/ci/fetch-libxray.sh
+cd levik_vpn_android
+ANDROID_HOME=/opt/android-sdk ./gradlew :app:testPlayDebugUnitTest :app:testDirectDebugUnitTest :app:lintPlayDebug :app:assemblePlayDebug
 ```
 
-Клиент написан на Kotlin с Jetpack Compose и использует стандартный Android `VpnService`. Нативное VPN-ядро не хранится в Git: CI получает зафиксированную upstream-версию и проверяет её контрольную сумму перед сборкой.
+Для упаковки Direct дополнительно нужны pinned Go/NDK из `levik_whitelist_relay/source/tools.lock`. Play не содержит VK native relay. Ни один debug APK не является проверенным production-релизом. Ключи подписи, API и update origin прежнего продукта не используются.
 
-GitHub Actions запускает Android Lint, модульные тесты и debug-сборки. Production-релизы создаются только из версионированных тегов в защищённом окружении.
+На текущем сервере эти toolchains установлены отдельно. Из `levik_vpn_android/` Direct пересобирается так:
 
-## Конфиденциальность и безопасность
+```bash
+GO_BIN=/root/.cache/hellokittyvpn-toolchains/go-1.26.5/bin/go \
+ANDROID_NDK_HOME=/root/.cache/hellokittyvpn-toolchains/android-sdk/ndk/29.0.14206865 \
+GOMAXPROCS=2 ANDROID_HOME=/opt/android-sdk \
+./gradlew :app:assembleDirectDebug :app:assembleDirectDebugAndroidTest \
+  --no-daemon --max-workers=1 -Dorg.gradle.jvmargs=-Xmx1g
+```
 
-Поведение открытого Android-клиента можно проверить непосредственно по исходному коду. Правила обработки данных сервисом описаны в [политике конфиденциальности](https://leviknet.com/legal/privacy).
+Instrumentation устанавливается вместе с app APK **того же flavor**. Local import проверен с native converter и Keystore на Android 13; реальное соединение с VPN-нодой и VK не подменяется этой проверкой.
 
-Инструкции по безопасному сообщению об уязвимости находятся в [SECURITY.md](SECURITY.md).
+Документы `docs/architecture.md`, `docs/security-model.md`, `docs/whitelist-map.md` и `docs/whitelist-relay.md` описывают upstream-базу; актуальные решения проекта находятся в `docs/hellokitty/`. Исторические release scripts/workflows не следует запускать для публикации Hello Kitty.
 
-## История изменений
+## Лицензии
 
-Изменения Android-приложения перечислены в [CHANGELOG.md](CHANGELOG.md). Готовые APK и описание каждого выпуска доступны в [GitHub Releases](https://github.com/Nort321/levik-vpn/releases).
-
-## Лицензия
-
-Оригинальный исходный код Levik VPN распространяется по лицензии [GNU AGPLv3](LICENSE). Сторонние компоненты сохраняют собственные лицензии; подробности приведены в [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Исходная лицензия [AGPL-3.0](LICENSE) и third-party notices сохраняются. Названия upstream в лицензиях, native source locks и совместимых wire-контрактах указывают происхождение кода; они не подключают приложение к чужой инфраструктуре. Условия лицензий учитываются и для бесплатного распространения.

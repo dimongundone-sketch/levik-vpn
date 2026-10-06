@@ -1,0 +1,240 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hellokittyvpn.org/contracts/routing-rules-v1.schema.json",
+  "title": "Hello Kitty VPN Routing Rules Package Manifest v1 Contract",
+  "description": "JSON Schema Draft 2020-12 for RoutingRulesManifest v1 and routing package data files.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "generatedAt",
+    "expiresAt",
+    "minimumClientVersion",
+    "keyId",
+    "purpose",
+    "caps",
+    "files",
+    "signature"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonically increasing version counter for anti-rollback protection."
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp when the routing rules package was generated and signed."
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp after which this routing package is considered stale and requires refresh."
+    },
+    "minimumClientVersion": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Minimum client build version required to parse and apply this package format."
+    },
+    "keyId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "Identifier of the trusted routing signing key in the client root trust store."
+    },
+    "purpose": {
+      "type": "string",
+      "const": "routing-rules-v1",
+      "description": "Cryptographic domain separation purpose string."
+    },
+    "caps": {
+      "$ref": "#/$defs/PackageCaps",
+      "description": "Package limits and safety caps enforced during download and decompression."
+    },
+    "files": {
+      "type": "array",
+      "description": "List of validated payload files included in the routing package bundle.",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "$ref": "#/$defs/ManifestFileEntry"
+      }
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "minLength": 80,
+      "maxLength": 120,
+      "description": "Base64url unpadded strict DER ECDSA P-256/SHA-256 signature over exact canonical manifest bytes."
+    }
+  },
+  "$defs": {
+    "PackageCaps": {
+      "type": "object",
+      "description": "Safety limits protecting client from zip bombs, memory exhaustion, and route table overflow.",
+      "additionalProperties": false,
+      "required": [
+        "maxDecodedPackageBytes",
+        "maxFiles",
+        "maxCidrEntries",
+        "maxDomainEntries"
+      ],
+      "properties": {
+        "maxDecodedPackageBytes": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 8388608,
+          "description": "Maximum allowed total uncompressed size in bytes (hard ceiling 8 MiB)."
+        },
+        "maxFiles": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8,
+          "description": "Maximum allowed number of payload files (hard ceiling 8)."
+        },
+        "maxCidrEntries": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536,
+          "description": "Maximum allowed aggregate CIDR entries across all CIDR files (hard ceiling 65,536)."
+        },
+        "maxDomainEntries": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000,
+          "description": "Maximum allowed aggregate domain entries across all domain files (hard ceiling 10,000)."
+        },
+        "maxDnsCacheEntries": {
+          "type": "integer",
+          "minimum": 128,
+          "maximum": 8192,
+          "default": 8192,
+          "description": "Maximum allowed client DNS cache entries for split routing."
+        },
+        "maxDnsCacheBytes": {
+          "type": "integer",
+          "minimum": 65536,
+          "maximum": 8388608,
+          "default": 8388608,
+          "description": "Maximum allowed memory in bytes for client DNS cache."
+        }
+      }
+    },
+    "ManifestFileEntry": {
+      "type": "object",
+      "description": "Metadata for a single payload file in the routing bundle.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "sha256",
+        "size",
+        "type"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9._-]+$",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "File name in the archive bundle (no directory traversals allowed)."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Lowercase hex SHA-256 hash of the uncompressed file bytes."
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8388608,
+          "description": "Exact size of uncompressed file in bytes."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "cidr-list",
+            "domain-list",
+            "config"
+          ],
+          "description": "Payload file type determining parser and validation rules."
+        },
+        "entryCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of validated entries (CIDR count or domain count)."
+        }
+      }
+    },
+    "RoutingPackageConfig": {
+      "type": "object",
+      "description": "Routing rules configuration structure stored in config-type payload files.",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "presets"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "integer",
+          "const": 1
+        },
+        "presets": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "bypassRu"
+          ],
+          "properties": {
+            "bypassRu": {
+              "$ref": "#/$defs/PresetConfig"
+            },
+            "global": {
+              "$ref": "#/$defs/PresetConfig"
+            },
+            "blockedOnly": {
+              "$ref": "#/$defs/PresetConfig"
+            }
+          }
+        }
+      }
+    },
+    "PresetConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "defaultAction"
+      ],
+      "properties": {
+        "defaultAction": {
+          "type": "string",
+          "enum": [
+            "proxy",
+            "direct"
+          ]
+        },
+        "directCidrFiles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]+$"
+          }
+        },
+        "directDomainFiles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]+$"
+          }
+        },
+        "proxyDomainFiles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]+$"
+          }
+        }
+      }
+    }
+  }
+}

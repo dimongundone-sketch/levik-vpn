@@ -1,0 +1,1300 @@
+openapi: 3.1.0
+info:
+  title: Hello Kitty VPN Mobile API
+  version: 1.0.0
+  description: |
+    Public client-facing API for the Hello Kitty VPN Android client.
+    Enforces hardware/Keystore-backed proof of possession (RequestSigner canonical v1),
+    atomic enrollment, single-family token rotation with lost-response idempotency recovery,
+    bounded server catalog discovery without query parameters, asynchronous profile provisioning (202 Accepted),
+    and cryptographic envelope v2 retrieval.
+servers:
+  - url: https://api.hellokittyvpn.org
+    description: Production mobile control plane
+  - url: http://127.0.0.1:8080
+    description: Local development / test instance
+
+paths:
+  /v1/devices/challenges:
+    post:
+      summary: Request authentication or enrollment challenge
+      description: |
+        Generates a CSPRNG nonce challenge for subsequent proof of possession.
+        Public endpoint without client authentication headers.
+        Strictly rate limited: 5 requests/min per invitation, 20 requests/min per source IP.
+      operationId: createDeviceChallenge
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChallengeRequest'
+            examples:
+              enrollment:
+                summary: Initial enrollment challenge
+                value:
+                  mode: enroll
+                  invitationCode: hkvpn-invite-7f9a2b8c4d1e
+                  spkiBase64Url: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz7ZkXw0d7v8L9k2M8x3pQ1Z7r4w5y6u7i8o9p0a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6IDAQAB
+                  capabilities:
+                    requestSigningAlgorithm: PS256
+                    profileEncryptionAlgorithm: RSA-OAEP-256+A256GCM
+              reauthentication:
+                summary: Device re-authentication challenge
+                value:
+                  mode: reauth
+                  spkiBase64Url: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz7ZkXw0d7v8L9k2M8x3pQ1Z7r4w5y6u7i8o9p0a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6IDAQAB
+                  capabilities:
+                    requestSigningAlgorithm: PS256
+                    profileEncryptionAlgorithm: RSA-OAEP-256+A256GCM
+      responses:
+        '200':
+          description: Challenge issued successfully (120 seconds TTL)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChallengeResponse'
+              examples:
+                success:
+                  value:
+                    challengeId: a1b2c3d4-e5f6-4a1b-8c2d-3e4f5a6b7c8d
+                    nonce: 47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU
+                    expiresAt: '2026-10-06T21:30:00Z'
+                    serverTime: '2026-10-06T21:28:00Z'
+                    keyId: srv-key-2026-10-a
+        '400':
+          description: Malformed request, unsupported algorithm, or missing invitationCode for enroll
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unknown device in reauth mode or invalid invitation code
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Invitation code already consumed or grant revoked
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /v1/devices/complete:
+    post:
+      summary: Complete enrollment or re-authentication with proof of possession
+      description: |
+        Atomically consumes the challenge and invitation to create or re-authenticate device.
+        Client signs canonical RequestSigner v1 payload with empty token hash.
+        Requires Idempotency-Key header equal to clientOperationId in request body.
+        Retrying with the same clientOperationId and body within 120s returns the cached response safely.
+      operationId: completeDeviceEnrollment
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/HeaderDeviceId'
+        - $ref: '#/components/parameters/HeaderTimestamp'
+        - $ref: '#/components/parameters/HeaderNonce'
+        - $ref: '#/components/parameters/HeaderSignature'
+        - $ref: '#/components/parameters/HeaderAlgorithm'
+        - $ref: '#/components/parameters/HeaderIdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteEnrollmentRequest'
+            examples:
+              complete:
+                value:
+                  challengeId: a1b2c3d4-e5f6-4a1b-8c2d-3e4f5a6b7c8d
+                  nonce: 47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU
+                  spkiBase64Url: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz7ZkXw0d7v8L9k2M8x3pQ1Z7r4w5y6u7i8o9p0a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6IDAQAB
+                  capabilities:
+                    requestSigningAlgorithm: PS256
+                    profileEncryptionAlgorithm: RSA-OAEP-256+A256GCM
+                  clientOperationId: b2c3d4e5-f6a1-4b2c-9d3e-4f5a6b7c8d9e
+      responses:
+        '200':
+          description: Enrollment or re-authentication succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompleteEnrollmentResponse'
+              examples:
+                success:
+                  value:
+                    deviceId: 8f4b2a3c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a
+                    accessToken: hkvpn_at_9948c2b5e13d9a04f21789c6b7e8
+                    accessTokenExpiresAt: '2026-10-06T21:45:00Z'
+                    refreshToken: hkvpn_rt_44a1e9c803bf2295d8e7c104ab35
+                    refreshTokenExpiresAt: '2026-11-05T21:30:00Z'
+                    grantExpiresAt: '2027-10-06T21:30:00Z'
+        '400':
+          description: Signature verification failed or Idempotency-Key does not match clientOperationId
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Challenge expired, challenge already consumed, or device revoked
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Idempotency conflict (same key with differing payload) or registration race
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /v1/tokens/refresh:
+    post:
+      summary: Rotate refresh token and obtain new access token
+      description: |
+        Rotates refresh token inside active family. No Authorization header is sent;
+        the refresh token is signed within the request body.
+        If a network loss occurs, exact retry within 120s with the same clientOperationId
+        recovers the previous response. Reusing a consumed refresh token with a new operationId
+        triggers immediate token family revocation.
+      operationId: refreshTokens
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/HeaderDeviceId'
+        - $ref: '#/components/parameters/HeaderTimestamp'
+        - $ref: '#/components/parameters/HeaderNonce'
+        - $ref: '#/components/parameters/HeaderSignature'
+        - $ref: '#/components/parameters/HeaderAlgorithm'
+        - $ref: '#/components/parameters/HeaderIdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+            examples:
+              refresh:
+                value:
+                  refreshToken: hkvpn_rt_44a1e9c803bf2295d8e7c104ab35
+                  clientOperationId: c3d4e5f6-a1b2-4c3d-ae4f-5a6b7c8d9e0f
+      responses:
+        '200':
+          description: Tokens refreshed and rotated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshTokenResponse'
+              examples:
+                success:
+                  value:
+                    accessToken: hkvpn_at_55b2d7c9a104e83f06129845cd12
+                    accessTokenExpiresAt: '2026-10-06T22:00:00Z'
+                    refreshToken: hkvpn_rt_88d3f1a04b5c7e962130e4b8df79
+                    refreshTokenExpiresAt: '2026-11-05T21:30:00Z'
+        '400':
+          description: Invalid signature or Idempotency-Key mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Refresh token invalid, expired, or family revoked due to reuse
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Idempotency conflict (same operationId with different refreshToken)
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '410':
+          description: REFRESH_RETRY_EXPIRED. Exact retry outside 120s window requires reauth challenge
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /v1/servers:
+    get:
+      summary: List candidate VPN servers
+      description: |
+        Retrieves bounded server catalog (<= 200 servers).
+        Requires Bearer access token and X-HKVPN-* request signing headers.
+        QUERY PARAMETERS ARE STRICTLY FORBIDDEN in signing v1 to prevent canonicalization attacks.
+      operationId: listServers
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/HeaderDeviceId'
+        - $ref: '#/components/parameters/HeaderTimestamp'
+        - $ref: '#/components/parameters/HeaderNonce'
+        - $ref: '#/components/parameters/HeaderSignature'
+        - $ref: '#/components/parameters/HeaderAlgorithm'
+      responses:
+        '200':
+          description: Server catalog retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerCatalogResponse'
+              examples:
+                catalog:
+                  value:
+                    servers:
+                      - id: d4e5f6a1-b2c3-4d4e-bf5a-6b7c8d9e0f1a
+                        displayName: Helsinki Fast Exit
+                        countryCode: FI
+                        region: hel1
+                        kind: xray
+                        capabilities:
+                          - vless
+                          - reality
+                          - xhttp
+                        health: healthy
+                        capacityStatus: available
+                      - id: e5f6a1b2-c3d4-4e5f-c06b-7c8d9e0f1a2b
+                        displayName: Moscow Backup Relay
+                        countryCode: RU
+                        region: msk1
+                        kind: relay
+                        capabilities:
+                          - turn-dtls
+                        health: healthy
+                        capacityStatus: available
+                    totalCount: 2
+        '401':
+          description: Unauthorized or invalid token/signature
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Device access grant revoked or expired
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /v1/profiles:
+    post:
+      summary: Request asynchronous tunnel profile provisioning
+      description: |
+        Submits a provisioning request for a target node and engine.
+        Returns 202 Accepted with operation ID.
+        No profile is issued or marked ready before observed node data-plane apply!
+      operationId: requestProfileProvisioning
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/HeaderDeviceId'
+        - $ref: '#/components/parameters/HeaderTimestamp'
+        - $ref: '#/components/parameters/HeaderNonce'
+        - $ref: '#/components/parameters/HeaderSignature'
+        - $ref: '#/components/parameters/HeaderAlgorithm'
+        - $ref: '#/components/parameters/HeaderIdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileProvisionRequest'
+            examples:
+              provision:
+                value:
+                  nodeId: d4e5f6a1-b2c3-4d4e-bf5a-6b7c8d9e0f1a
+                  engine: xray
+                  rulesVersion: 1
+                  clientOperationId: f6a1b2c3-d4e5-4f6a-817c-8d9e0f1a2b3c
+      responses:
+        '202':
+          description: Provisioning operation accepted and queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncOperationResponse'
+              examples:
+                accepted:
+                  value:
+                    operationId: f6a1b2c3-d4e5-4f6a-817c-8d9e0f1a2b3c
+                    status: pending
+                    retryAfterSeconds: 2
+        '400':
+          description: Invalid request parameters or signature
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Access grant expired or device revoked
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Active lease capacity exceeded (max 2 leases per device) or idempotency conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /v1/operations/{id}:
+    get:
+      summary: Poll status of an asynchronous operation
+      description: |
+        Retrieves current state of profile provisioning or renewal operation.
+        Strictly enforces device ownership.
+      operationId: getOperationStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Operation UUID
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/HeaderDeviceId'
+        - $ref: '#/components/parameters/HeaderTimestamp'
+        - $ref: '#/components/parameters/HeaderNonce'
+        - $ref: '#/components/parameters/HeaderSignature'
+        - $ref: '#/components/parameters/HeaderAlgorithm'
+      responses:
+        '200':
+          description: Operation status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationDetailResponse'
+              examples:
+                pending:
+                  value:
+                    operationId: f6a1b2c3-d4e5-4f6a-817c-8d9e0f1a2b3c
+                    status: pending
+                    retryAfterSeconds: 2
+                ready:
+                  value:
+                    operationId: f6a1b2c3-d4e5-4f6a-817c-8d9e0f1a2b3c
+                    status: ready
+                    profileId: 1a2b3c4d-5e6f-4a1b-8c2d-3e4f5a6b7c8d
+                failed:
+                  value:
+                    operationId: f6a1b2c3-d4e5-4f6a-817c-8d9e0f1a2b3c
+                    status: failed
+                    errorCode: NODE_PROVISION_TIMEOUT
+                    errorMessage: Node worker did not confirm lease within 10 seconds
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Operation not found or owned by a different device
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /v1/profiles/{id}:
+    get:
+      summary: Retrieve encrypted tunnel profile envelope v2
+      description: |
+        Fetches encrypted TunnelProfileEnvelopeV2.
+        Profile is encrypted using AES256-GCM and wrapped with client RSA public key.
+        Authenticated via strict DER ECDSA P-256 server signature.
+      operationId: getProfileEnvelope
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Profile UUID
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/HeaderDeviceId'
+        - $ref: '#/components/parameters/HeaderTimestamp'
+        - $ref: '#/components/parameters/HeaderNonce'
+        - $ref: '#/components/parameters/HeaderSignature'
+        - $ref: '#/components/parameters/HeaderAlgorithm'
+      responses:
+        '200':
+          description: Profile envelope retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TunnelProfileEnvelopeV2'
+              examples:
+                envelope:
+                  value:
+                    protected: eyJwdXJwb3NlIjoicHJvZmlsZSIsInNjaGVtYVZlcnNpb24iOjJ9
+                    wrappedKey: d3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVzd3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVzd3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVzd3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVzd3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVzd3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVzd3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVzd3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVzd3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVz
+                    iv: dGhpc0lzQVJhbmRv
+                    ciphertext: Y2lwaGVydGV4dEJ5dGVzUGx1czE2Qnl0ZXNUYWc
+                    signature: MEUCIQDx3z9_example_signature_base64url_string_that_is_at_least_80_chars_long_and_valid_der_AiEA8y_test
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Profile not found or not owned by calling device
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '410':
+          description: Profile revoked or superseded
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /v1/credentials/{id}/renew:
+    post:
+      summary: Renew or rotate tunnel credentials
+      description: |
+        Requests safe asynchronous renewal and revision rotation for an existing active profile lease.
+        Enforces CAS (Compare-And-Swap) revision check on expectedRevision.
+      operationId: renewCredentials
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Profile or credential ID
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/HeaderDeviceId'
+        - $ref: '#/components/parameters/HeaderTimestamp'
+        - $ref: '#/components/parameters/HeaderNonce'
+        - $ref: '#/components/parameters/HeaderSignature'
+        - $ref: '#/components/parameters/HeaderAlgorithm'
+        - $ref: '#/components/parameters/HeaderIdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenewCredentialRequest'
+            examples:
+              renew:
+                value:
+                  expectedRevision: 1
+                  clientOperationId: 2b3c4d5e-6f1a-4b2c-9d3e-4f5a6b7c8d9e
+      responses:
+        '202':
+          description: Credential renewal operation accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncOperationResponse'
+              examples:
+                accepted:
+                  value:
+                    operationId: 2b3c4d5e-6f1a-4b2c-9d3e-4f5a6b7c8d9e
+                    status: pending
+                    retryAfterSeconds: 3
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Revision conflict (expectedRevision did not match current revision)
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /v1/devices/me:
+    delete:
+      summary: Revoke calling device, grant, tokens, and active node leases
+      description: |
+        Naturally idempotent device revocation.
+        Body MUST BE EMPTY.
+        Header Idempotency-Key MUST NOT be provided.
+        Subsequent calls return 401 Unauthorized or 410 Gone.
+      operationId: revokeCurrentDevice
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/HeaderDeviceId'
+        - $ref: '#/components/parameters/HeaderTimestamp'
+        - $ref: '#/components/parameters/HeaderNonce'
+        - $ref: '#/components/parameters/HeaderSignature'
+        - $ref: '#/components/parameters/HeaderAlgorithm'
+      responses:
+        '204':
+          description: Device and all associated sessions/leases revoked
+        '401':
+          description: Unauthorized or already revoked
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '410':
+          description: Device already permanently gone
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /v1/routing-rules/manifest:
+    get:
+      summary: Retrieve signed routing rules manifest
+      description: |
+        Public endpoint returning versioned routing manifest with file hashes and ECDSA signature.
+        Supports caching with ETag and Cache-Control. No authentication headers required.
+      operationId: getRoutingRulesManifest
+      security: []
+      responses:
+        '200':
+          description: Routing rules manifest retrieved
+          headers:
+            ETag:
+              schema:
+                type: string
+              example: '"w/manifest-v1-hash9982"'
+            Cache-Control:
+              schema:
+                type: string
+              example: 'public, max-age=3600'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoutingRulesManifest'
+              examples:
+                manifest:
+                  value:
+                    version: 1
+                    generatedAt: '2026-10-06T12:00:00Z'
+                    expiresAt: '2026-10-13T12:00:00Z'
+                    minimumClientVersion: 1
+                    keyId: routing-root-2026
+                    purpose: routing-rules-v1
+                    caps:
+                      maxDecodedPackageBytes: 8388608
+                      maxFiles: 8
+                      maxCidrEntries: 65536
+                      maxDomainEntries: 10000
+                    files:
+                      - name: ru_cidr.txt
+                        sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+                        size: 450200
+                        type: cidr-list
+                        entryCount: 12500
+                      - name: ru_domains.txt
+                        sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+                        size: 120500
+                        type: domain-list
+                        entryCount: 3200
+                    signature: MEUCIQDx3z9_example_signature_base64url_string_that_is_at_least_80_chars_long_and_valid_der_AiEA8y_test
+        '304':
+          description: Not modified (cached manifest is up to date)
+
+  /livez:
+    get:
+      summary: Liveness health check probe
+      description: Lightweight liveness check for container / process supervisor.
+      operationId: checkLiveness
+      security: []
+      responses:
+        '200':
+          description: Service is alive
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /readyz:
+    get:
+      summary: Readiness health check probe
+      description: Verifies database connectivity and essential internal subsystem readiness.
+      operationId: checkReadiness
+      security: []
+      responses:
+        '200':
+          description: Service is ready to accept traffic
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - database
+                properties:
+                  status:
+                    type: string
+                    example: ready
+                  database:
+                    type: string
+                    example: connected
+        '503':
+          description: Service is not ready
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - database
+                properties:
+                  status:
+                    type: string
+                    example: not_ready
+                  database:
+                    type: string
+                    example: disconnected
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        Opaque 256-bit bearer access token.
+        When making signed requests, token hash is computed as SHA256(accessToken.encodeToByteArray()).
+
+  parameters:
+    HeaderDeviceId:
+      name: X-HKVPN-Device-Id
+      in: header
+      required: true
+      description: Device fingerprint (lowercase hex SHA-256 of candidate SPKI DER).
+      schema:
+        type: string
+        pattern: '^[0-9a-f]{64}$'
+      example: 8f4b2a3c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a
+
+    HeaderTimestamp:
+      name: X-HKVPN-Timestamp
+      in: header
+      required: true
+      description: Client epoch seconds timestamp (must be within +-120 seconds of server clock).
+      schema:
+        type: integer
+      example: 1791322080
+
+    HeaderNonce:
+      name: X-HKVPN-Nonce
+      in: header
+      required: true
+      description: 16 random CSPRNG bytes base64url unpadded (exactly 22 characters). Replay cache 5 min.
+      schema:
+        type: string
+        pattern: '^[A-Za-z0-9_-]{22}$'
+      example: 47DEQpj8HBSa-_TImW-5JC
+
+    HeaderSignature:
+      name: X-HKVPN-Signature
+      in: header
+      required: true
+      description: Base64url unpadded signature produced by client private key over canonical v1 bytes.
+      schema:
+        type: string
+        pattern: '^[A-Za-z0-9_-]+$'
+      example: d3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVz
+
+    HeaderAlgorithm:
+      name: X-HKVPN-Algorithm
+      in: header
+      required: true
+      description: Request signing algorithm declared by device capability.
+      schema:
+        $ref: '#/components/schemas/SigningAlgorithm'
+      example: PS256
+
+    HeaderIdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Idempotency key (UUID), strictly matching clientOperationId in JSON body.
+      schema:
+        type: string
+        format: uuid
+      example: b2c3d4e5-f6a1-4b2c-9d3e-4f5a6b7c8d9e
+
+  schemas:
+    SigningAlgorithm:
+      type: string
+      enum:
+        - PS256
+        - RS256
+      description: Supported RequestSigner signature algorithms.
+
+    ProfileEncryptionAlgorithm:
+      type: string
+      enum:
+        - RSA-OAEP-256+A256GCM
+        - RSA-OAEP+A256GCM
+      description: Supported profile key wrapping and payload encryption algorithms.
+
+    DeviceCapabilities:
+      type: object
+      description: Cryptographic algorithm capabilities negotiated with Android Keystore.
+      additionalProperties: false
+      required:
+        - requestSigningAlgorithm
+        - profileEncryptionAlgorithm
+      properties:
+        requestSigningAlgorithm:
+          $ref: '#/components/schemas/SigningAlgorithm'
+        profileEncryptionAlgorithm:
+          $ref: '#/components/schemas/ProfileEncryptionAlgorithm'
+
+    ChallengeRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - mode
+        - spkiBase64Url
+        - capabilities
+      properties:
+        mode:
+          type: string
+          enum:
+            - enroll
+            - reauth
+          description: Enrollment for new devices or re-authentication for known devices.
+        invitationCode:
+          type: string
+          minLength: 8
+          maxLength: 64
+          pattern: '^[A-Za-z0-9_-]+$'
+          description: One-time invitation token (required when mode == enroll).
+        spkiBase64Url:
+          type: string
+          minLength: 100
+          maxLength: 2048
+          pattern: '^[A-Za-z0-9_-]+$'
+          description: Base64url unpadded DER SubjectPublicKeyInfo of device RSA key (3072 or 4096 bits).
+        capabilities:
+          $ref: '#/components/schemas/DeviceCapabilities'
+
+    ChallengeResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - challengeId
+        - nonce
+        - expiresAt
+        - serverTime
+        - keyId
+      properties:
+        challengeId:
+          type: string
+          format: uuid
+        nonce:
+          type: string
+          pattern: '^[A-Za-z0-9_-]{43}$'
+          description: 32 random CSPRNG bytes base64url unpadded.
+        expiresAt:
+          type: string
+          format: date-time
+          description: Expiry timestamp (exactly 120 seconds TTL).
+        serverTime:
+          type: string
+          format: date-time
+          description: Trusted server time for clock adjustment.
+        keyId:
+          type: string
+          minLength: 1
+          maxLength: 64
+
+    CompleteEnrollmentRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - challengeId
+        - nonce
+        - spkiBase64Url
+        - capabilities
+        - clientOperationId
+      properties:
+        challengeId:
+          type: string
+          format: uuid
+        nonce:
+          type: string
+          pattern: '^[A-Za-z0-9_-]{43}$'
+        spkiBase64Url:
+          type: string
+          pattern: '^[A-Za-z0-9_-]+$'
+        capabilities:
+          $ref: '#/components/schemas/DeviceCapabilities'
+        clientOperationId:
+          type: string
+          format: uuid
+          description: Client operation UUID matching Idempotency-Key header.
+
+    CompleteEnrollmentResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - deviceId
+        - accessToken
+        - accessTokenExpiresAt
+        - refreshToken
+        - refreshTokenExpiresAt
+        - grantExpiresAt
+      properties:
+        deviceId:
+          type: string
+          pattern: '^[0-9a-f]{64}$'
+        accessToken:
+          type: string
+          minLength: 32
+          maxLength: 128
+          description: Opaque random 256-bit bearer access token.
+        accessTokenExpiresAt:
+          type: string
+          format: date-time
+          description: Access token expiration (15 minutes TTL).
+        refreshToken:
+          type: string
+          minLength: 32
+          maxLength: 128
+          description: Opaque random 256-bit refresh token.
+        refreshTokenExpiresAt:
+          type: string
+          format: date-time
+          description: Refresh token expiration (30 days absolute TTL).
+        grantExpiresAt:
+          type: string
+          format: date-time
+          description: Device access grant expiration.
+
+    RefreshTokenRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - refreshToken
+        - clientOperationId
+      properties:
+        refreshToken:
+          type: string
+          minLength: 32
+          maxLength: 128
+        clientOperationId:
+          type: string
+          format: uuid
+          description: Operation UUID matching Idempotency-Key header.
+
+    RefreshTokenResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - accessToken
+        - accessTokenExpiresAt
+        - refreshToken
+        - refreshTokenExpiresAt
+      properties:
+        accessToken:
+          type: string
+          minLength: 32
+          maxLength: 128
+        accessTokenExpiresAt:
+          type: string
+          format: date-time
+        refreshToken:
+          type: string
+          minLength: 32
+          maxLength: 128
+        refreshTokenExpiresAt:
+          type: string
+          format: date-time
+
+    ServerItem:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - displayName
+        - countryCode
+        - region
+        - kind
+        - capabilities
+        - health
+        - capacityStatus
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 64
+        countryCode:
+          type: string
+          pattern: '^[A-Z]{2}$'
+        region:
+          type: string
+          minLength: 1
+          maxLength: 64
+        kind:
+          type: string
+          enum:
+            - xray
+            - relay
+        capabilities:
+          type: array
+          items:
+            type: string
+          example:
+            - vless
+            - reality
+            - xhttp
+        health:
+          type: string
+          enum:
+            - healthy
+            - degraded
+            - unhealthy
+        capacityStatus:
+          type: string
+          enum:
+            - available
+            - limited
+            - full
+
+    ServerCatalogResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - servers
+        - totalCount
+      properties:
+        servers:
+          type: array
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/ServerItem'
+        totalCount:
+          type: integer
+          minimum: 0
+          maximum: 200
+
+    ProfileProvisionRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - nodeId
+        - engine
+        - rulesVersion
+        - clientOperationId
+      properties:
+        nodeId:
+          type: string
+          format: uuid
+        engine:
+          type: string
+          enum:
+            - xray
+            - relay
+        rulesVersion:
+          type: integer
+          minimum: 0
+        clientOperationId:
+          type: string
+          format: uuid
+
+    RenewCredentialRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - expectedRevision
+        - clientOperationId
+      properties:
+        expectedRevision:
+          type: integer
+          minimum: 1
+        clientOperationId:
+          type: string
+          format: uuid
+
+    AsyncOperationResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - operationId
+        - status
+        - retryAfterSeconds
+      properties:
+        operationId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+            - pending
+        retryAfterSeconds:
+          type: integer
+          minimum: 1
+          maximum: 60
+
+    OperationDetailResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - operationId
+        - status
+      properties:
+        operationId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/OperationStatus'
+        profileId:
+          type: string
+          format: uuid
+          nullable: true
+        errorCode:
+          type: string
+          nullable: true
+        errorMessage:
+          type: string
+          nullable: true
+        retryAfterSeconds:
+          type: integer
+          nullable: true
+
+    OperationStatus:
+      type: string
+      enum:
+        - pending
+        - ready
+        - failed
+      description: State machine status of an asynchronous provisioning or renewal operation.
+
+    LeaseState:
+      type: string
+      enum:
+        - requested
+        - applying
+        - active
+        - revoking
+        - expired
+        - failed
+      description: Node data-plane credential lease lifecycle states.
+
+    ClientTunnelState:
+      type: string
+      enum:
+        - DISCONNECTED
+        - PREPARING
+        - CONNECTING
+        - VERIFYING
+        - CONNECTED
+        - DEGRADED
+        - RECONNECTING
+        - PAUSED
+        - BLOCKED_BY_NETWORK
+        - CREDENTIAL_EXPIRED
+        - ERROR
+      description: Standard Android client VPN tunnel state machine vocabulary.
+
+    TunnelProfileEnvelopeV2:
+      type: object
+      description: Encrypted and signed tunnel profile envelope received by the client.
+      additionalProperties: false
+      required:
+        - protected
+        - wrappedKey
+        - iv
+        - ciphertext
+        - signature
+      properties:
+        protected:
+          type: string
+          pattern: '^[A-Za-z0-9_-]+$'
+          maxLength: 21846
+          description: Base64url unpadded UTF-8 JSON metadata (max 16 KiB decoded).
+        wrappedKey:
+          type: string
+          pattern: '^[A-Za-z0-9_-]+$'
+          minLength: 341
+          maxLength: 684
+          description: Base64url unpadded RSA-OAEP wrapped session key (256-512 bytes).
+        iv:
+          type: string
+          pattern: '^[A-Za-z0-9_-]{16}$'
+          minLength: 16
+          maxLength: 16
+          description: Base64url unpadded 12-byte AES-GCM IV.
+        ciphertext:
+          type: string
+          pattern: '^[A-Za-z0-9_-]+$'
+          maxLength: 1398124
+          description: Base64url unpadded AES-256-GCM ciphertext + 16B tag (decrypted payload max 1 MiB).
+        signature:
+          type: string
+          pattern: '^[A-Za-z0-9_-]+$'
+          minLength: 80
+          maxLength: 120
+          description: Base64url unpadded strict DER ECDSA P-256/SHA-256 signature.
+
+    RoutingRulesManifest:
+      type: object
+      description: Public signed manifest defining routing rule package bundles.
+      additionalProperties: false
+      required:
+        - version
+        - generatedAt
+        - expiresAt
+        - minimumClientVersion
+        - keyId
+        - purpose
+        - caps
+        - files
+        - signature
+      properties:
+        version:
+          type: integer
+          minimum: 1
+        generatedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        minimumClientVersion:
+          type: integer
+          minimum: 1
+        keyId:
+          type: string
+          minLength: 1
+          maxLength: 64
+        purpose:
+          type: string
+          const: routing-rules-v1
+        caps:
+          type: object
+          additionalProperties: false
+          required:
+            - maxDecodedPackageBytes
+            - maxFiles
+            - maxCidrEntries
+            - maxDomainEntries
+          properties:
+            maxDecodedPackageBytes:
+              type: integer
+              maximum: 8388608
+            maxFiles:
+              type: integer
+              maximum: 8
+            maxCidrEntries:
+              type: integer
+              maximum: 65536
+            maxDomainEntries:
+              type: integer
+              maximum: 10000
+        files:
+          type: array
+          minItems: 1
+          maxItems: 8
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - name
+              - sha256
+              - size
+              - type
+            properties:
+              name:
+                type: string
+                pattern: '^[a-zA-Z0-9._-]+$'
+                minLength: 1
+                maxLength: 64
+              sha256:
+                type: string
+                pattern: '^[0-9a-f]{64}$'
+              size:
+                type: integer
+                minimum: 1
+                maximum: 8388608
+              type:
+                type: string
+                enum:
+                  - cidr-list
+                  - domain-list
+                  - config
+              entryCount:
+                type: integer
+                minimum: 0
+        signature:
+          type: string
+          pattern: '^[A-Za-z0-9_-]+$'
+          minLength: 80
+          maxLength: 120
+
+    ProblemDetails:
+      type: object
+      description: RFC 7807 problem details specification for API errors.
+      additionalProperties: false
+      required:
+        - code
+        - title
+        - status
+        - detail
+        - retryable
+        - requestId
+      properties:
+        code:
+          type: string
+          example: INVALID_SIGNATURE
+          description: Machine-readable uppercase snake_case error code.
+        title:
+          type: string
+          example: Request signature verification failed
+        status:
+          type: integer
+          example: 400
+        detail:
+          type: string
+          example: Canonical bytes did not match the provided X-HKVPN-Signature header.
+        retryable:
+          type: boolean
+          example: false
+        retryAfterSeconds:
+          type: integer
+          nullable: true
+          example: null
+        requestId:
+          type: string
+          example: req-7f9a2b8c4d1e-20261006-2130

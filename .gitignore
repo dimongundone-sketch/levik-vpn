@@ -110,3 +110,9 @@ pnpm-debug.log*
 # Local iOS project and its convenience symlink
 /levik_vpn_ios/
 /LevikVPN iOS
+
+# Scratch planning files (do not commit to remote)
+/task*.md
+/task.md
+/implementation_plan*.md
+/*_plan*.md

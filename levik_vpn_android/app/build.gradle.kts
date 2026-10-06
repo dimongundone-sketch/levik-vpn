@@ -62,8 +62,8 @@ data class ReleaseSigningInputs(
 }
 
 fun releaseSigningInputs(distribution: String): ReleaseSigningInputs {
-    val propertyPrefix = "levik.$distribution.signing"
-    val environmentPrefix = "LEVIK_${distribution.uppercase()}_SIGNING"
+    val propertyPrefix = "hkvpn.$distribution.signing"
+    val environmentPrefix = "HKVPN_${distribution.uppercase()}_SIGNING"
     val storeFilePath = protectedBuildProperty(
         "$propertyPrefix.storeFile",
         "${environmentPrefix}_STORE_FILE",
@@ -88,18 +88,17 @@ fun releaseSigningInputs(distribution: String): ReleaseSigningInputs {
     )
 }
 
-val cabinetBaseUrl = buildProperty("levik.cabinetBaseUrl", "https://leviknet.com")
 val playIntegrityCloudProjectNumber =
-    buildProperty("levik.playIntegrityCloudProjectNumber", "0").toLongOrNull() ?: 0L
+    buildProperty("hkvpn.playIntegrityCloudProjectNumber", "0").toLongOrNull() ?: 0L
 val directUpdateManifestPublicKey =
-    providers.gradleProperty("levik.updateManifestPublicKey").orNull
-        ?: localProperties.getProperty("levik.updateManifestPublicKey")
-        ?: System.getenv("LEVIK_UPDATE_MANIFEST_PUBLIC_KEY")
+    providers.gradleProperty("hkvpn.updateManifestPublicKey").orNull
+        ?: localProperties.getProperty("hkvpn.updateManifestPublicKey")
+        ?: System.getenv("HKVPN_UPDATE_MANIFEST_PUBLIC_KEY")
         ?: ""
 val directUpdateSigningCertificateSha256 =
-    providers.gradleProperty("levik.updateSigningCertificateSha256").orNull
-        ?: localProperties.getProperty("levik.updateSigningCertificateSha256")
-        ?: System.getenv("LEVIK_UPDATE_SIGNING_CERTIFICATE_SHA256")
+    providers.gradleProperty("hkvpn.updateSigningCertificateSha256").orNull
+        ?: localProperties.getProperty("hkvpn.updateSigningCertificateSha256")
+        ?: System.getenv("HKVPN_UPDATE_SIGNING_CERTIFICATE_SHA256")
         ?: ""
 val libXrayAar = layout.projectDirectory.file("libs/libXray.aar").asFile
 val expectedLibXraySha256 = "4708a361a74f7e955635dbe3661cefb459bdc867423c3b1826a2c5a6ea4ac77d"
@@ -166,17 +165,16 @@ fun normalizedCertificateSha256(value: String): String =
     value.trim().replace(":", "").lowercase()
 
 android {
-    namespace = "com.leviknet.vpn"
+    namespace = "org.hellokittyvpn.android"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.leviknet.vpn"
+        applicationId = "org.hellokittyvpn.android"
         minSdk = 26
         targetSdk = 36
         versionCode = 69
         versionName = rootProject.version.toString()
 
-        buildConfigField("String", "CABINET_BASE_URL", "\"${cabinetBaseUrl.trimEnd('/')}\"")
         buildConfigField("String", "LIBXRAY_VERSION", "\"v26.7.28\"")
         buildConfigField(
             "long",
@@ -186,7 +184,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
 
-        val abiFilterProperty = providers.gradleProperty("levik.abiFilters").orNull
+        val abiFilterProperty = providers.gradleProperty("hkvpn.abiFilters").orNull
         if (abiFilterProperty != null) {
             ndk {
                 //noinspection ChromeOsAbiSupport -- Optional filters produce device-specific APKs.
@@ -242,16 +240,16 @@ android {
             buildConfigField("boolean", "SELF_UPDATE_ENABLED", "false")
             buildConfigField("boolean", "EXTERNAL_PURCHASES_ENABLED", "false")
             buildConfigField("boolean", "PLAY_INTEGRITY_ENABLED", "true")
-            buildConfigField("boolean", "LEVIK_RELAY_ENABLED", "false")
+            buildConfigField("boolean", "HKVPN_RELAY_ENABLED", "false")
         }
         create("direct") {
             dimension = "distribution"
             signingConfig = signingConfigs.getByName("directRelease")
             buildConfigField("boolean", "IS_PLAY_DISTRIBUTION", "false")
             buildConfigField("boolean", "SELF_UPDATE_ENABLED", "true")
-            buildConfigField("boolean", "EXTERNAL_PURCHASES_ENABLED", "true")
+            buildConfigField("boolean", "EXTERNAL_PURCHASES_ENABLED", "false")
             buildConfigField("boolean", "PLAY_INTEGRITY_ENABLED", "false")
-            buildConfigField("boolean", "LEVIK_RELAY_ENABLED", "true")
+            buildConfigField("boolean", "HKVPN_RELAY_ENABLED", "true")
             buildConfigField(
                 "String",
                 "DIRECT_UPDATE_MANIFEST_PUBLIC_KEY",
@@ -468,7 +466,7 @@ fun validateDirectUpdatePublicKey() {
         KeyFactory.getInstance("EC").generatePublic(X509EncodedKeySpec(encoded))
     } catch (error: Exception) {
         throw GradleException(
-            "levik.updateManifestPublicKey must be a Base64 X.509 ECDSA P-256 public key.",
+            "hkvpn.updateManifestPublicKey must be a Base64 X.509 ECDSA P-256 public key.",
             error,
         )
     }
@@ -483,7 +481,7 @@ fun validateDirectUpdatePublicKey() {
             publicKey.params.order == expectedP256Parameters.order &&
             publicKey.params.cofactor == expectedP256Parameters.cofactor,
     ) {
-        "levik.updateManifestPublicKey must use the P-256 curve."
+        "hkvpn.updateManifestPublicKey must use the P-256 curve."
     }
 }
 

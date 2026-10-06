@@ -1,0 +1,487 @@
+package crypto_test
+
+import (
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/hex"
+	"fmt"
+	"sync"
+	"testing"
+)
+
+type GrantRecord struct {
+	GrantID   string
+	DeviceID  string
+	Status    string // "ACTIVE" | "REVOKED" | "EXPIRED"
+	ExpiresAt float64
+}
+
+type TokenRecord struct {
+	TokenHash            string
+	FamilyID             string
+	DeviceID             string
+	IsUsed               bool
+	IsRevoked            bool
+	UsedAt               float64
+	IssuanceOpID         string
+	IssuanceBodyHash     string
+	ConsumedByOpID       string
+	ConsumedByBodyHash   string
+}
+
+type CachedResponse struct {
+	Payload   map[string]any
+	ExpiresAt float64
+}
+
+type DeviceRecord struct {
+	Status  string
+	GrantID string
+}
+
+type AuthControlPlaneState struct {
+	mu               sync.Mutex
+	devices          map[string]DeviceRecord
+	grants           map[string]*GrantRecord
+	tokenFamilies    map[string]bool // familyId -> isRevoked
+	refreshTokens    map[string]*TokenRecord
+	accessTokens     map[string]string // tokenHash -> familyId
+	cachedResponses  map[string]*CachedResponse
+	idempotencyStore map[string]string // owner:opId -> bodyHash
+	auditEvents      []string
+}
+
+func newAuthState() *AuthControlPlaneState {
+	return &AuthControlPlaneState{
+		devices:          make(map[string]DeviceRecord),
+		grants:           make(map[string]*GrantRecord),
+		tokenFamilies:    make(map[string]bool),
+		refreshTokens:    make(map[string]*TokenRecord),
+		accessTokens:     make(map[string]string),
+		cachedResponses:  make(map[string]*CachedResponse),
+		idempotencyStore: make(map[string]string),
+	}
+}
+
+func generateRandomToken() string {
+	b := make([]byte, 32)
+	_, _ = rand.Read(b)
+	return "hkvpn_" + base64.RawURLEncoding.EncodeToString(b)
+}
+
+func generateUUID() string {
+	b := make([]byte, 16)
+	_, _ = rand.Read(b)
+	b[6] = (b[6] & 0x0f) | 0x40 // Version 4
+	b[8] = (b[8] & 0x3f) | 0x80 // Variant RFC 4122
+	return fmt.Sprintf("%08x-%04x-%04x-%04x-%012x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:16])
+}
+
+func hashSha256(data string) string {
+	h := sha256.Sum256([]byte(data))
+	return hex.EncodeToString(h[:])
+}
+
+func (s *AuthControlPlaneState) enrollDevice(deviceID string, grantDuration float64, now float64) (string, string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	familyID := fmt.Sprintf("fam_%s", generateUUID())
+	grantID := fmt.Sprintf("grant_%s", generateUUID())
+
+	s.grants[grantID] = &GrantRecord{
+		GrantID:   grantID,
+		DeviceID:  deviceID,
+		Status:    "ACTIVE",
+		ExpiresAt: now + grantDuration,
+	}
+	s.devices[deviceID] = DeviceRecord{
+		Status:  "ACTIVE",
+		GrantID: grantID,
+	}
+	s.tokenFamilies[familyID] = false
+
+	acc := generateRandomToken()
+	ref := generateRandomToken()
+
+	accH := hashSha256(acc)
+	refH := hashSha256(ref)
+
+	s.accessTokens[accH] = familyID
+	s.refreshTokens[refH] = &TokenRecord{
+		TokenHash:        refH,
+		FamilyID:         familyID,
+		DeviceID:         deviceID,
+		IssuanceOpID:     "enroll_init",
+		IssuanceBodyHash: "initial",
+	}
+	return acc, ref
+}
+
+func (s *AuthControlPlaneState) handleRefresh(
+	deviceID string,
+	idempotencyKey string,
+	refreshToken string,
+	clientOpID string,
+	rawBody []byte,
+	now float64,
+) (int, map[string]any) {
+	// Rule 1: Header Idempotency-Key == clientOperationId
+	if idempotencyKey != clientOpID {
+		return 400, map[string]any{"code": "INVALID_IDEMPOTENCY_KEY"}
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// Rule 2: Device must be active
+	dev, devExists := s.devices[deviceID]
+	if !devExists || dev.Status != "ACTIVE" {
+		return 401, map[string]any{"code": "DEVICE_NOT_ACTIVE"}
+	}
+
+	// Rule 3: Grant must be active and not expired
+	grant, grantExists := s.grants[dev.GrantID]
+	if !grantExists || grant.Status != "ACTIVE" {
+		return 401, map[string]any{"code": "GRANT_INACTIVE"}
+	}
+	if grant.ExpiresAt <= now {
+		return 401, map[string]any{"code": "GRANT_EXPIRED"}
+	}
+
+	bodyHash := hex.EncodeToString(func() []byte {
+		h := sha256.Sum256(rawBody)
+		return h[:]
+	}())
+
+	tokenHash := hashSha256(refreshToken)
+	rec, exists := s.refreshTokens[tokenHash]
+	if !exists {
+		return 401, map[string]any{"code": "INVALID_TOKEN"}
+	}
+
+	// Rule 4: Device ownership verification
+	// Foreign device attempting to use token must be rejected without revoking victim family
+	if rec.DeviceID != deviceID {
+		s.auditEvents = append(s.auditEvents, fmt.Sprintf("TOKEN_DEVICE_MISMATCH:token_dev=%s,caller=%s", rec.DeviceID, deviceID))
+		return 401, map[string]any{"code": "TOKEN_DEVICE_MISMATCH"}
+	}
+
+	if s.tokenFamilies[rec.FamilyID] || rec.IsRevoked {
+		return 401, map[string]any{"code": "FAMILY_REVOKED"}
+	}
+
+	idempKey := fmt.Sprintf("%s:%s", deviceID, clientOpID)
+
+	// Check 1: Idempotency payload conflict (same opId, different body)
+	if prevBodyHash, seen := s.idempotencyStore[idempKey]; seen {
+		if prevBodyHash != bodyHash {
+			return 409, map[string]any{"code": "IDEMPOTENCY_CONFLICT"}
+		}
+	}
+
+	// Check 2: Already CONSUMED token
+	if rec.IsUsed {
+		if rec.ConsumedByOpID == clientOpID {
+			if rec.ConsumedByBodyHash != bodyHash {
+				return 409, map[string]any{"code": "IDEMPOTENCY_CONFLICT"}
+			}
+
+			// Check 120s window
+			elapsed := now - rec.UsedAt
+			if elapsed <= 120.0 {
+				cacheKey := fmt.Sprintf("resp:%s:%s", deviceID, clientOpID)
+				cached := s.cachedResponses[cacheKey]
+				if cached != nil {
+					res := make(map[string]any)
+					for k, v := range cached.Payload {
+						res[k] = v
+					}
+					res["_recoveredFromCache"] = true
+					return 200, res
+				}
+				return 401, map[string]any{"code": "CACHE_UNAVAILABLE"}
+			}
+			return 401, map[string]any{
+				"code":    "REFRESH_RETRY_EXPIRED",
+				"message": "Recovery window expired",
+			}
+		}
+
+		// Token Reuse Attack Detected!
+		s.auditEvents = append(s.auditEvents, fmt.Sprintf("TOKEN_REUSE_DETECTED:%s", rec.FamilyID))
+		s.tokenFamilies[rec.FamilyID] = true // Revoke entire family!
+		return 401, map[string]any{
+			"code":    "TOKEN_REUSED",
+			"message": "Token reuse attack detected; family revoked",
+		}
+	}
+
+	// Happy path: Rotate tokens
+	rec.IsUsed = true
+	rec.UsedAt = now
+	rec.ConsumedByOpID = clientOpID
+	rec.ConsumedByBodyHash = bodyHash
+
+	newAcc := generateRandomToken()
+	newRef := generateRandomToken()
+	newAccH := hashSha256(newAcc)
+	newRefH := hashSha256(newRef)
+
+	s.accessTokens[newAccH] = rec.FamilyID
+	s.refreshTokens[newRefH] = &TokenRecord{
+		TokenHash:        newRefH,
+		FamilyID:         rec.FamilyID,
+		DeviceID:         deviceID,
+		IssuanceOpID:     clientOpID,
+		IssuanceBodyHash: bodyHash,
+	}
+
+	resp := map[string]any{
+		"accessToken":  newAcc,
+		"refreshToken": newRef,
+		"expiresIn":    900,
+	}
+
+	cacheKey := fmt.Sprintf("resp:%s:%s", deviceID, clientOpID)
+	s.cachedResponses[cacheKey] = &CachedResponse{
+		Payload:   resp,
+		ExpiresAt: now + 120.0,
+	}
+	s.idempotencyStore[idempKey] = bodyHash
+
+	return 200, resp
+}
+
+func (s *AuthControlPlaneState) handleReauth(deviceID string) (int, map[string]any) {
+	s.mu.Lock()
+	dev, devExists := s.devices[deviceID]
+	if !devExists || dev.Status != "ACTIVE" {
+		s.mu.Unlock()
+		return 401, map[string]any{"code": "DEVICE_NOT_FOUND"}
+	}
+	for rec := range s.refreshTokens {
+		if s.refreshTokens[rec].DeviceID == deviceID {
+			s.tokenFamilies[s.refreshTokens[rec].FamilyID] = true
+		}
+	}
+	s.mu.Unlock()
+
+	acc, ref := s.enrollDevice(deviceID, 86400, 1700001000)
+	return 200, map[string]any{
+		"accessToken":   acc,
+		"refreshToken":  ref,
+		"reauthSuccess": true,
+	}
+}
+
+func (s *AuthControlPlaneState) handleDeleteDevice(deviceID string, idempHeader *string) (int, map[string]any) {
+	if idempHeader != nil {
+		return 400, map[string]any{"code": "IDEMPOTENCY_KEY_NOT_PERMITTED"}
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	dev, devExists := s.devices[deviceID]
+	if !devExists || dev.Status != "ACTIVE" {
+		return 410, map[string]any{"code": "DEVICE_ALREADY_REVOKED"}
+	}
+	s.devices[deviceID] = DeviceRecord{
+		Status:  "REVOKED",
+		GrantID: dev.GrantID,
+	}
+	if grant, exists := s.grants[dev.GrantID]; exists {
+		grant.Status = "REVOKED"
+	}
+	for rec := range s.refreshTokens {
+		if s.refreshTokens[rec].DeviceID == deviceID {
+			s.tokenFamilies[s.refreshTokens[rec].FamilyID] = true
+		}
+	}
+	return 204, nil
+}
+
+func TestLostResponseRefreshStateProbe(t *testing.T) {
+	state := newAuthState()
+	deviceID := "test_dev_go_9ecbb43ac6fbda663bd81db7f89b50b955692453"
+
+	// 1. Initial enrollment
+	_, ref1 := state.enrollDevice(deviceID, 86400, 1700000000)
+
+	// 2. Initial rotation
+	t0 := float64(1700000000)
+	op1 := "op-go-refresh-1001"
+	body1 := []byte(fmt.Sprintf(`{"refreshToken":"%s","clientOperationId":"%s"}`, ref1, op1))
+
+	status, resp1 := state.handleRefresh(deviceID, op1, ref1, op1, body1, t0)
+	if status != 200 {
+		t.Fatalf("expected 200 on initial refresh, got %d", status)
+	}
+	ref2 := resp1["refreshToken"].(string)
+
+	// 3. Exact Retry within 120s
+	tRetry := t0 + 30.0
+	statusRetry, respRetry := state.handleRefresh(deviceID, op1, ref1, op1, body1, tRetry)
+	if statusRetry != 200 {
+		t.Fatalf("expected 200 on exact retry, got %d", statusRetry)
+	}
+	if respRetry["_recoveredFromCache"] != true {
+		t.Fatalf("expected _recoveredFromCache == true")
+	}
+	if respRetry["refreshToken"] != ref2 {
+		t.Fatalf("expected same refreshToken, got %v", respRetry["refreshToken"])
+	}
+
+	// Verify token family is NOT revoked
+	ref2Hash := hashSha256(ref2)
+	rec2 := state.refreshTokens[ref2Hash]
+	if rec2.IsUsed || rec2.IsRevoked {
+		t.Fatalf("successor token must be active and not revoked")
+	}
+
+	// 4. Payload Conflict (409)
+	altBody := []byte(fmt.Sprintf(`{"refreshToken":"%s","clientOperationId":"%s","tamper":true}`, ref1, op1))
+	statusConflict, _ := state.handleRefresh(deviceID, op1, ref1, op1, altBody, t0+35.0)
+	if statusConflict != 409 {
+		t.Fatalf("expected 409 Conflict, got %d", statusConflict)
+	}
+
+	// 5. Cross-Device Refresh Rejection (foreign device trying to refresh device A's token)
+	devB := "test_dev_b_attacker_go"
+	state.enrollDevice(devB, 86400, t0)
+	opCross := "op-cross-device-go"
+	bodyCross := []byte(fmt.Sprintf(`{"refreshToken":"%s","clientOperationId":"%s"}`, ref2, opCross))
+	statusCross, respCross := state.handleRefresh(devB, opCross, ref2, opCross, bodyCross, t0+38.0)
+	if statusCross != 401 || respCross["code"] != "TOKEN_DEVICE_MISMATCH" {
+		t.Fatalf("expected 401 TOKEN_DEVICE_MISMATCH for cross-device probe, got %d (%v)", statusCross, respCross)
+	}
+	// Verify victim's family is NOT revoked
+	if state.tokenFamilies[rec2.FamilyID] {
+		t.Fatalf("victim token family must NOT be revoked on foreign device probe")
+	}
+
+	// 6. Token reuse attack (consumed token + new opId on original device)
+	attackerOp := "op-attacker-evil-go"
+	attackerBody := []byte(fmt.Sprintf(`{"refreshToken":"%s","clientOperationId":"%s"}`, ref1, attackerOp))
+	statusReuse, respReuse := state.handleRefresh(deviceID, attackerOp, ref1, attackerOp, attackerBody, t0+40.0)
+	if statusReuse != 401 || respReuse["code"] != "TOKEN_REUSED" {
+		t.Fatalf("expected 401 TOKEN_REUSED, got %d (%v)", statusReuse, respReuse)
+	}
+
+	// Legitimate client with ref2 must now fail
+	statusFamRev, _ := state.handleRefresh(deviceID, "op-next", ref2, "op-next", []byte(`{}`), t0+45.0)
+	if statusFamRev != 401 {
+		t.Fatalf("expected 401 FAMILY_REVOKED, got %d", statusFamRev)
+	}
+
+	// 7. Expired recovery window (> 120s)
+	dev2 := "test_dev2_expired_go"
+	_, ref3 := state.enrollDevice(dev2, 86400, 1700001000)
+	t1 := float64(1700001000)
+	opExp := "op-exp-go-01"
+	bodyExp := []byte(fmt.Sprintf(`{"refreshToken":"%s","clientOperationId":"%s"}`, ref3, opExp))
+
+	state.handleRefresh(dev2, opExp, ref3, opExp, bodyExp, t1)
+
+	// Retry at 130s (> 120s)
+	statusLate, respLate := state.handleRefresh(dev2, opExp, ref3, opExp, bodyExp, t1+130.0)
+	if statusLate != 401 || respLate["code"] != "REFRESH_RETRY_EXPIRED" {
+		t.Fatalf("expected 401 REFRESH_RETRY_EXPIRED, got %d (%v)", statusLate, respLate)
+	}
+
+	// Reauth recovery
+	statusReauth, respReauth := state.handleReauth(dev2)
+	if statusReauth != 200 || respReauth["reauthSuccess"] != true {
+		t.Fatalf("expected 200 reauth success, got %d", statusReauth)
+	}
+
+	// 8. Grant Expiration
+	devGrant := "test_dev_grant_exp_go"
+	_, refG := state.enrollDevice(devGrant, 60, t0) // 60s grant
+	opG := "op-grant-exp-go"
+	bodyG := []byte(fmt.Sprintf(`{"refreshToken":"%s","clientOperationId":"%s"}`, refG, opG))
+	statusGrantExp, respGrantExp := state.handleRefresh(devGrant, opG, refG, opG, bodyG, t0+65.0)
+	if statusGrantExp != 401 || respGrantExp["code"] != "GRANT_EXPIRED" {
+		t.Fatalf("expected 401 GRANT_EXPIRED, got %d (%v)", statusGrantExp, respGrantExp)
+	}
+
+	// 9. DELETE /v1/devices/me natural idempotency
+	dev3 := "test_dev3_delete_go"
+	state.enrollDevice(dev3, 86400, t0)
+
+	badH := "header-key"
+	statusBadDel, _ := state.handleDeleteDevice(dev3, &badH)
+	if statusBadDel != 400 {
+		t.Fatalf("expected 400 on DELETE with header, got %d", statusBadDel)
+	}
+
+	statusDel1, _ := state.handleDeleteDevice(dev3, nil)
+	if statusDel1 != 204 {
+		t.Fatalf("expected 204 on first DELETE, got %d", statusDel1)
+	}
+
+	statusDel2, _ := state.handleDeleteDevice(dev3, nil)
+	if statusDel2 != 410 {
+		t.Fatalf("expected 410 on repeated DELETE, got %d", statusDel2)
+	}
+}
+
+func TestConcurrentRefreshRaces(t *testing.T) {
+	state := newAuthState()
+	deviceID := "test_dev_concurrent_race"
+	tBase := float64(1700005000)
+
+	_, refInit := state.enrollDevice(deviceID, 86400, tBase)
+	opRace := "op-concurrent-exact-retry"
+	bodyRace := []byte(fmt.Sprintf(`{"refreshToken":"%s","clientOperationId":"%s"}`, refInit, opRace))
+
+	// Initial rotation
+	statusInit, respInit := state.handleRefresh(deviceID, opRace, refInit, opRace, bodyRace, tBase)
+	if statusInit != 200 {
+		t.Fatalf("failed initial rotation: %d", statusInit)
+	}
+	expectedRef := respInit["refreshToken"].(string)
+
+	// Launch 20 concurrent retries of the exact same request
+	const numWorkers = 20
+	var wg sync.WaitGroup
+	results := make([]struct {
+		status int
+		ref    string
+		cached bool
+	}, numWorkers)
+
+	for i := 0; i < numWorkers; i++ {
+		wg.Add(1)
+		go func(idx int) {
+			defer wg.Done()
+			status, resp := state.handleRefresh(deviceID, opRace, refInit, opRace, bodyRace, tBase+10.0)
+			recovered, _ := resp["_recoveredFromCache"].(bool)
+			refStr, _ := resp["refreshToken"].(string)
+			results[idx] = struct {
+				status int
+				ref    string
+				cached bool
+			}{
+				status: status,
+				ref:    refStr,
+				cached: recovered,
+			}
+		}(i)
+	}
+
+	wg.Wait()
+
+	for idx, r := range results {
+		if r.status != 200 {
+			t.Fatalf("worker %d got non-200 status: %d", idx, r.status)
+		}
+		if r.ref != expectedRef {
+			t.Fatalf("worker %d got unexpected refresh token: %s (expected %s)", idx, r.ref, expectedRef)
+		}
+		if !r.cached {
+			t.Fatalf("worker %d did not get cached response", idx)
+		}
+	}
+}

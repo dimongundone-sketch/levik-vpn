@@ -1,0 +1,517 @@
+openapi: 3.1.0
+info:
+  title: Hello Kitty VPN Xray Node-Agent Private Management API v2
+  version: 2.0.0
+  description: >
+    Private management API for provisioning, inspecting, and revoking VLESS
+    client credentials on Xray core nodes. Remote access is permitted strictly
+    through an mTLS reverse proxy terminating worker certificate authentication.
+    Requests require HMAC-SHA256 signature headers with a durable replay cache.
+servers:
+  - url: https://node-xray.internal
+    description: Private mTLS endpoint accessed exclusively by the control plane outbox worker.
+paths:
+  /livez:
+    get:
+      summary: Node process liveness
+      description: Returns HTTP 200 if the agent HTTP server is alive and responding.
+      responses:
+        "200":
+          description: Agent process is alive
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+
+  /readyz:
+    get:
+      summary: Xray Core management socket readiness
+      description: >
+        Probes the local Xray gRPC HandlerService via loopback IPC.
+        Returns HTTP 200 if the core is running and accepts commands;
+        returns HTTP 503 if the core is starting, unreachable, or crashed.
+      responses:
+        "200":
+          description: Xray core is ready and responsive
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+        "503":
+          description: Xray core gRPC HandlerService is unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthError"
+
+  /internal/v2/xray/credentials/apply:
+    post:
+      summary: Apply (create or renew) a client VLESS credential on the node
+      description: >
+        Dynamically provisions a VLESS user into the specified inboundTag via
+        Xray HandlerService.AlterInbound(AddUser). If the credential already exists
+        with the exact same parameters and revision, returns the existing observed
+        status idempotently. Strictly enforces monotonic revision ordering.
+      operationId: applyXrayCredential
+      parameters:
+        - $ref: "#/components/parameters/NodeKeyId"
+        - $ref: "#/components/parameters/NodeTimestamp"
+        - $ref: "#/components/parameters/NodeNonce"
+        - $ref: "#/components/parameters/NodeSignature"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplyCredentialRequest"
+      responses:
+        "200":
+          description: Credential already active (idempotent retry)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplyCredentialResponse"
+        "201":
+          description: Credential successfully provisioned and applied to core
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplyCredentialResponse"
+        "400":
+          $ref: "#/components/responses/ProblemResponse"
+        "401":
+          $ref: "#/components/responses/ProblemResponse"
+        "409":
+          $ref: "#/components/responses/ProblemResponse"
+        "429":
+          $ref: "#/components/responses/ProblemResponse"
+        "503":
+          $ref: "#/components/responses/ProblemResponse"
+
+  /internal/v2/xray/credentials/revoke:
+    post:
+      summary: Revoke a client VLESS credential from the node
+      description: >
+        Removes the VLESS user from the specified inboundTag via
+        Xray HandlerService.AlterInbound(RemoveUser). Advance durable tombstone
+        revision. Returns status revoked or absent.
+      operationId: revokeXrayCredential
+      parameters:
+        - $ref: "#/components/parameters/NodeKeyId"
+        - $ref: "#/components/parameters/NodeTimestamp"
+        - $ref: "#/components/parameters/NodeNonce"
+        - $ref: "#/components/parameters/NodeSignature"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RevokeCredentialRequest"
+      responses:
+        "200":
+          description: Credential successfully revoked or already absent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevokeCredentialResponse"
+        "400":
+          $ref: "#/components/responses/ProblemResponse"
+        "401":
+          $ref: "#/components/responses/ProblemResponse"
+        "409":
+          $ref: "#/components/responses/ProblemResponse"
+        "429":
+          $ref: "#/components/responses/ProblemResponse"
+        "503":
+          $ref: "#/components/responses/ProblemResponse"
+
+  /internal/v2/xray/credentials/status:
+    post:
+      summary: Read current observed status of a credential on the node
+      description: >
+        Queries the node local persistent journal and verifies core generation.
+        Never mutates revision or returns secret keys.
+      operationId: getXrayCredentialStatus
+      parameters:
+        - $ref: "#/components/parameters/NodeKeyId"
+        - $ref: "#/components/parameters/NodeTimestamp"
+        - $ref: "#/components/parameters/NodeNonce"
+        - $ref: "#/components/parameters/NodeSignature"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StatusCredentialRequest"
+      responses:
+        "200":
+          description: Current credential status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusCredentialResponse"
+        "400":
+          $ref: "#/components/responses/ProblemResponse"
+        "401":
+          $ref: "#/components/responses/ProblemResponse"
+        "404":
+          $ref: "#/components/responses/ProblemResponse"
+        "503":
+          $ref: "#/components/responses/ProblemResponse"
+
+components:
+  parameters:
+    NodeKeyId:
+      name: X-HKVPN-Node-Key-Id
+      in: header
+      required: true
+      description: Identifier of the shared pre-distributed HMAC secret key.
+      schema:
+        type: string
+        pattern: "^[A-Za-z0-9._-]{1,64}$"
+        example: "worker-prod-01"
+
+    NodeTimestamp:
+      name: X-HKVPN-Node-Timestamp
+      in: header
+      required: true
+      description: Unix epoch seconds. Validated within ±120s clock skew window.
+      schema:
+        type: string
+        pattern: "^[0-9]{10}$"
+        example: "1728250000"
+
+    NodeNonce:
+      name: X-HKVPN-Node-Nonce
+      in: header
+      required: true
+      description: >
+        CSPRNG 16+ raw bytes unpadded base64url. Verified against durable replay
+        cache persisting across node restarts with 5m TTL.
+      schema:
+        type: string
+        pattern: "^[A-Za-z0-9_-]{22,128}$"
+        example: "D7xN_1rM7s-Q3zL9bKp0_w"
+
+    NodeSignature:
+      name: X-HKVPN-Node-Signature
+      in: header
+      required: true
+      description: >
+        Lowercase hex HMAC-SHA256 of canonical bytes:
+        "hkvpn-node-hmac-v2\n<timestamp>\n<nonce>\n<METHOD>\n<requestURI>\n<sha256Hex(body)>"
+      schema:
+        type: string
+        pattern: "^[0-9a-f]{64}$"
+        example: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Must byte-for-byte match body.idempotencyKey.
+      schema:
+        type: string
+        pattern: "^[A-Za-z0-9._:-]{16,128}$"
+        example: "apply-cred-01925b6a-8b1e-7000-8000-000000000001"
+
+  schemas:
+    ApplyCredentialRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - credentialId
+        - deviceId
+        - inboundTag
+        - protocol
+        - uuid
+        - desiredRevision
+        - expiresAt
+        - idempotencyKey
+      properties:
+        credentialId:
+          type: string
+          format: uuid
+          description: Unique control plane UUIDv7 of the credential record.
+          example: "01925b6a-8b1e-7000-8000-000000000001"
+        deviceId:
+          type: string
+          pattern: "^[0-9a-f]{64}$"
+          description: Lowercase hex SHA-256 SPKI fingerprint of the client device.
+          example: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        inboundTag:
+          type: string
+          pattern: "^[a-z0-9_-]{1,64}$"
+          description: Target inbound tag defined in local Xray configuration template.
+          example: "vless-reality-in"
+        protocol:
+          type: string
+          enum: [vless]
+          description: Protocol driver for the credential.
+          example: "vless"
+        uuid:
+          type: string
+          format: uuid
+          description: VLESS client user ID provisioned into Xray core.
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        desiredRevision:
+          type: integer
+          format: int64
+          minimum: 1
+          description: Strictly monotonic desired revision of this credential.
+          example: 1
+        expiresAt:
+          type: integer
+          format: int64
+          minimum: 1
+          description: Unix epoch seconds when this credential expires on the node (now + 60s to now + 86400s).
+          example: 1728336400
+        idempotencyKey:
+          type: string
+          pattern: "^[A-Za-z0-9._:-]{16,128}$"
+          description: Unique idempotency key matching Idempotency-Key header.
+          example: "apply-cred-01925b6a-8b1e-7000-8000-000000000001"
+
+    ApplyCredentialResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - credentialId
+        - inboundTag
+        - status
+        - observedRevision
+        - generation
+        - lastObservedAt
+      properties:
+        credentialId:
+          type: string
+          format: uuid
+          example: "01925b6a-8b1e-7000-8000-000000000001"
+        inboundTag:
+          type: string
+          example: "vless-reality-in"
+        status:
+          type: string
+          enum: [active, applied]
+          example: "active"
+        observedRevision:
+          type: integer
+          format: int64
+          minimum: 1
+          example: 1
+        generation:
+          type: integer
+          format: int64
+          minimum: 1
+          description: Node boot epoch / generation counter.
+          example: 1
+        lastObservedAt:
+          type: integer
+          format: int64
+          description: Unix epoch seconds of authoritative application.
+          example: 1728250005
+
+    RevokeCredentialRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - credentialId
+        - inboundTag
+        - uuid
+        - desiredRevision
+        - idempotencyKey
+      properties:
+        credentialId:
+          type: string
+          format: uuid
+          example: "01925b6a-8b1e-7000-8000-000000000001"
+        inboundTag:
+          type: string
+          pattern: "^[a-z0-9_-]{1,64}$"
+          example: "vless-reality-in"
+        uuid:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        desiredRevision:
+          type: integer
+          format: int64
+          minimum: 1
+          example: 2
+        idempotencyKey:
+          type: string
+          pattern: "^[A-Za-z0-9._:-]{16,128}$"
+          example: "revoke-cred-01925b6a-8b1e-7000-8000-000000000001"
+
+    RevokeCredentialResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - credentialId
+        - inboundTag
+        - status
+        - observedRevision
+        - generation
+      properties:
+        credentialId:
+          type: string
+          format: uuid
+          example: "01925b6a-8b1e-7000-8000-000000000001"
+        inboundTag:
+          type: string
+          example: "vless-reality-in"
+        status:
+          type: string
+          enum: [revoked, absent]
+          example: "revoked"
+        observedRevision:
+          type: integer
+          format: int64
+          example: 2
+        generation:
+          type: integer
+          format: int64
+          example: 1
+
+    StatusCredentialRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - credentialId
+        - inboundTag
+      properties:
+        credentialId:
+          type: string
+          format: uuid
+          example: "01925b6a-8b1e-7000-8000-000000000001"
+        inboundTag:
+          type: string
+          pattern: "^[a-z0-9_-]{1,64}$"
+          example: "vless-reality-in"
+
+    StatusCredentialResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - credentialId
+        - inboundTag
+        - desiredRevision
+        - observedRevision
+        - status
+        - lastObservedAt
+        - generation
+      properties:
+        credentialId:
+          type: string
+          format: uuid
+          example: "01925b6a-8b1e-7000-8000-000000000001"
+        inboundTag:
+          type: string
+          example: "vless-reality-in"
+        desiredRevision:
+          type: integer
+          format: int64
+          example: 1
+        observedRevision:
+          type: integer
+          format: int64
+          example: 1
+        status:
+          type: string
+          enum: [active, expired, revoking, revoked, absent, unknown]
+          example: "active"
+        lastObservedAt:
+          type: integer
+          format: int64
+          example: 1728250005
+        generation:
+          type: integer
+          format: int64
+          example: 1
+        expiresAt:
+          type: integer
+          format: int64
+          example: 1728336400
+
+    Health:
+      type: object
+      additionalProperties: false
+      required:
+        - ok
+        - protocolVersion
+        - generation
+      properties:
+        ok:
+          type: boolean
+          const: true
+        protocolVersion:
+          type: integer
+          const: 2
+        generation:
+          type: integer
+          format: int64
+          minimum: 1
+          example: 1
+
+    HealthError:
+      type: object
+      additionalProperties: false
+      required:
+        - ok
+        - code
+      properties:
+        ok:
+          type: boolean
+          const: false
+        code:
+          type: string
+          enum: [xray_socket_unavailable, xray_core_down, state_storage_error]
+          example: "xray_socket_unavailable"
+
+    ProblemDetails:
+      type: object
+      additionalProperties: false
+      required:
+        - type
+        - title
+        - status
+        - code
+      properties:
+        type:
+          type: string
+          format: uri
+          example: "about:blank"
+        title:
+          type: string
+          example: "Revision Conflict"
+        status:
+          type: integer
+          example: 409
+        code:
+          type: string
+          enum:
+            - invalid_request
+            - unauthorized
+            - stale_revision
+            - revision_gap
+            - state_conflict
+            - xray_alter_failed
+            - replay_detected
+            - node_draining
+          example: "stale_revision"
+        detail:
+          type: string
+          example: "Desired revision 1 is less than currently observed revision 2."
+        requestId:
+          type: string
+          example: "req-01925b6a-8b1e-7000-8000-000000000001"
+
+  responses:
+    ProblemResponse:
+      description: RFC 7807 problem details response
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"

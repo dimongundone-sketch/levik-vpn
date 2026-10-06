@@ -1,0 +1,519 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hellokittyvpn.org/contracts/profile-v2.schema.json",
+  "title": "Hello Kitty VPN Tunnel Profile v2 Contract",
+  "description": "JSON Schema Draft 2020-12 for TunnelProfileEnvelopeV2 (encrypted wire representation) and TunnelProfilePayloadV2 (decrypted client configuration).",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/TunnelProfileEnvelopeV2"
+    },
+    {
+      "$ref": "#/$defs/TunnelProfilePayloadV2"
+    }
+  ],
+  "$defs": {
+    "TunnelProfileEnvelopeV2": {
+      "type": "object",
+      "description": "Encrypted and cryptographically signed tunnel profile envelope received by the client.",
+      "additionalProperties": false,
+      "required": [
+        "protected",
+        "wrappedKey",
+        "iv",
+        "ciphertext",
+        "signature"
+      ],
+      "properties": {
+        "protected": {
+          "type": "string",
+          "description": "Base64url-encoded UTF-8 JSON metadata (max 16 KiB decoded). Matches TunnelProfileProtectedHeader schema.",
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "maxLength": 21846
+        },
+        "wrappedKey": {
+          "type": "string",
+          "description": "Base64url-encoded AES-256 session key encrypted with the client device's RSA public key (256-512 bytes).",
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "minLength": 341,
+          "maxLength": 684
+        },
+        "iv": {
+          "type": "string",
+          "description": "Base64url-encoded 12-byte IV for AES-256-GCM (exactly 16 unpadded characters).",
+          "pattern": "^[A-Za-z0-9_-]{16}$",
+          "minLength": 16,
+          "maxLength": 16
+        },
+        "ciphertext": {
+          "type": "string",
+          "description": "Base64url-encoded AES-256-GCM ciphertext + 16-byte authentication tag. Decrypted payload max 1 MiB.",
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "maxLength": 1398124
+        },
+        "signature": {
+          "type": "string",
+          "description": "Base64url-encoded strict DER ECDSA P-256/SHA-256 signature produced by the server key over canonical envelope bytes.",
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "minLength": 80,
+          "maxLength": 120
+        }
+      }
+    },
+    "TunnelProfileProtectedHeader": {
+      "type": "object",
+      "description": "Decoded representation of the protected header base64url string. Authenticated via AES-GCM AAD and server ECDSA signature.",
+      "additionalProperties": false,
+      "required": [
+        "purpose",
+        "schemaVersion",
+        "keyId",
+        "signatureAlgorithm",
+        "encAlgorithm",
+        "deviceId",
+        "accessId",
+        "profileId",
+        "profileRevision",
+        "issuedAt",
+        "credentialExpiresAt"
+      ],
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "const": "profile",
+          "description": "Cryptographic domain separation purpose string."
+        },
+        "schemaVersion": {
+          "type": "integer",
+          "const": 2,
+          "description": "Profile envelope schema version."
+        },
+        "keyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "Identifier of the server key used to sign the envelope."
+        },
+        "signatureAlgorithm": {
+          "type": "string",
+          "enum": [
+            "ES256"
+          ],
+          "description": "Signature algorithm for the envelope (strict DER ECDSA P-256 with SHA-256)."
+        },
+        "encAlgorithm": {
+          "type": "string",
+          "enum": [
+            "RSA-OAEP-256+A256GCM",
+            "RSA-OAEP+A256GCM"
+          ],
+          "description": "Key wrapping and payload encryption algorithms negotiated with the device."
+        },
+        "deviceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Client device fingerprint (lowercase hex SHA-256 of candidate SPKI DER)."
+        },
+        "accessId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Identifier of the access grant owning this profile."
+        },
+        "profileId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier of this tunnel profile instance."
+        },
+        "profileRevision": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonically increasing profile revision for anti-rollback verification."
+        },
+        "issuedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "UTC timestamp when the profile was generated."
+        },
+        "credentialExpiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "UTC timestamp when the credentials in this profile expire."
+        }
+      }
+    },
+    "TunnelProfilePayloadV2": {
+      "type": "object",
+      "description": "Decrypted UTF-8 JSON payload contained in the ciphertext of TunnelProfileEnvelopeV2.",
+      "additionalProperties": false,
+      "required": [
+        "profileSchemaVersion",
+        "profileId",
+        "accessId",
+        "deviceId",
+        "issuedAt",
+        "credentialExpiresAt",
+        "profileRevision",
+        "rulesVersion",
+        "engine",
+        "servers"
+      ],
+      "properties": {
+        "profileSchemaVersion": {
+          "type": "integer",
+          "const": 2,
+          "description": "Payload schema version, strictly 2."
+        },
+        "profileId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier of the profile, matching protected header."
+        },
+        "accessId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Access grant ID, matching protected header."
+        },
+        "deviceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Client device fingerprint, matching protected header."
+        },
+        "issuedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Issuance timestamp, matching protected header."
+        },
+        "credentialExpiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Credential expiration timestamp, matching protected header."
+        },
+        "profileRevision": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic revision, matching protected header."
+        },
+        "rulesVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Routing rules version associated with this profile."
+        },
+        "engine": {
+          "type": "string",
+          "enum": [
+            "xray",
+            "relay"
+          ],
+          "description": "VPN tunnel engine kind."
+        },
+        "servers": {
+          "type": "array",
+          "description": "Candidate server configurations available to this profile.",
+          "minItems": 1,
+          "maxItems": 200,
+          "items": {
+            "$ref": "#/$defs/TunnelServerV2"
+          }
+        },
+        "bootstrap": {
+          "$ref": "#/$defs/RelayBootstrapV2",
+          "description": "Bootstrap parameters required for the relay engine."
+        },
+        "routing": {
+          "$ref": "#/$defs/TunnelRoutingV2",
+          "description": "Optional inline routing preset overrides."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "engine": {
+                "const": "relay"
+              }
+            },
+            "required": [
+              "engine"
+            ]
+          },
+          "then": {
+            "required": [
+              "bootstrap"
+            ]
+          }
+        }
+      ]
+    },
+    "TunnelServerV2": {
+      "type": "object",
+      "description": "Configuration and routing metadata for an individual tunnel server.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "tag",
+        "name",
+        "countryCode",
+        "outbound",
+        "engine",
+        "category",
+        "networkRequirement"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Server node ID."
+        },
+        "tag": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "Internal outbound routing tag (e.g. proxy-xray-fi-01)."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "Human-readable server display name."
+        },
+        "countryCode": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$",
+          "description": "ISO 3166-1 alpha-2 uppercase country code (e.g. FI, DE, NL, RU)."
+        },
+        "outbound": {
+          "type": "object",
+          "description": "Engine-specific outbound JSON configuration (e.g. Xray outbound with VLESS/Reality)."
+        },
+        "engine": {
+          "type": "string",
+          "enum": [
+            "xray",
+            "relay"
+          ]
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "regular",
+            "mobile",
+            "mobile-allowlist"
+          ],
+          "description": "Server category determining traffic limits and routing behavior."
+        },
+        "networkRequirement": {
+          "type": "string",
+          "enum": [
+            "any",
+            "cellular-allowlist"
+          ],
+          "description": "Physical network binding requirements for this server."
+        },
+        "relayConfig": {
+          "$ref": "#/$defs/RelayServerConfigV2"
+        }
+      }
+    },
+    "RelayBootstrapV2": {
+      "type": "object",
+      "description": "Relay session and credential bootstrap payload.",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "protocol",
+        "policy",
+        "entitlementId",
+        "deviceId",
+        "credentialId",
+        "accessToken",
+        "expiresAt",
+        "nodes"
+      ],
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "protocol": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "policy": {
+          "$ref": "#/$defs/RelayPolicyV2"
+        },
+        "entitlementId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "deviceId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "credentialId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "accessToken": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/RelayNodeV2"
+          }
+        }
+      }
+    },
+    "RelayPolicyV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "deviceSlots",
+        "trafficAccounting"
+      ],
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "deviceSlots": {
+          "type": "string",
+          "enum": [
+            "remnawave-hwid-shared"
+          ]
+        },
+        "trafficAccounting": {
+          "type": "string",
+          "enum": [
+            "relay-separate"
+          ]
+        }
+      }
+    },
+    "RelayNodeV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "displayName",
+        "countryCode",
+        "host",
+        "port",
+        "turnFrontSni",
+        "transport",
+        "serverPublicKey",
+        "turnHashes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "countryCode": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$"
+        },
+        "host": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 253
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "turnFrontSni": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 253
+        },
+        "transport": {
+          "type": "string",
+          "enum": [
+            "turn-dtls"
+          ]
+        },
+        "serverPublicKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "turnHashes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "RelayServerConfigV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bootstrap",
+        "node"
+      ],
+      "properties": {
+        "bootstrap": {
+          "$ref": "#/$defs/RelayBootstrapV2"
+        },
+        "node": {
+          "$ref": "#/$defs/RelayNodeV2"
+        },
+        "routing": {
+          "$ref": "#/$defs/TunnelRoutingV2"
+        }
+      }
+    },
+    "TunnelRoutingV2": {
+      "type": "object",
+      "description": "Inline routing bypass and proxy policies for the profile.",
+      "additionalProperties": false,
+      "properties": {
+        "policyVersion": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "directCidrs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(([0-9]{1,3}\\.){3}[0-9]{1,3}/[0-9]{1,2}|([0-9a-fA-F:]+)/[0-9]{1,3})$"
+          }
+        },
+        "directDomains": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$"
+          }
+        },
+        "proxyDomains": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$"
+          }
+        }
+      }
+    }
+  }
+}

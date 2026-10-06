@@ -1,0 +1,615 @@
+{
+  "version": "1.0",
+  "description": "Golden test vectors for Hello Kitty VPN RequestSigner v1 (Proof-of-Possession)",
+  "keys": {
+    "modern_device": {
+      "keyId": "device-modern-rsa3072",
+      "algorithm": "PS256",
+      "keyType": "RSA-3072",
+      "deviceId": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+      "publicKeySpkiDerBase64Url": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE",
+      "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp+CMT/6j9DniZOwde\nTP05dut7EBd19JmjN9lY3hmpbO3L9/2Wj7egpVQXre+yqpk8Zl9dRIy26dMBnmTW\nLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi/Lt7T4SfP9\nSGM914M42axQYp/+K9d/tybg7u/F1LV/EgkTL9NpklIM2pc6mAncnCb7W0f8p76L\n+q/O7MwoCxoDiX6nAuqgIbOW8I66Y/lHigz5LxsdK1a4IKUq/mqc5kFeiWZIpRav\nCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jge\nctqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0/m//w\n85R9oBnaUb9wytMK0d+bwulUWhmcOSYgqhTmWFAejGRnZQi+kgGB244GWwLenEyf\nDrCsayiu/GKjjP0OzOG4gxXDj9UCzTTkfl0Ov/PY5IKVAgMBAAE=\n-----END PUBLIC KEY-----\n",
+      "privateKeyPkcs8Pem": "-----BEGIN PRIVATE KEY-----\n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\nzukyAFGuDHhwhxd13+jiCLk=\n-----END PRIVATE KEY-----\n"
+    },
+    "legacy_device": {
+      "keyId": "device-legacy-rsa3072",
+      "algorithm": "RS256",
+      "keyType": "RSA-3072",
+      "deviceId": "b1cc40d997b926c867ce5390fcf6bca917c0479062ef509ca1c27d9d11c21100",
+      "publicKeySpkiDerBase64Url": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA4EnoiBthkAkY4r10dD3BKv1g1EYdzA0Rj3MAWktb-6-pQuY_kAiR9EyGEOPEZst34Se0LFkw0Y0IgIbdJUdc7kBGZ02RN2e5uq7xp8cyPlp1kmrmoFycqBmKIpjCZnmOeNfNU88sEl_0mXbSR89Ez52ezUSbXg5K4m1-W8zJHUPzTIx3VcURWb4FfvpFcPqeZySbJBeqd9DlxCfl8rE7tEOZDuBC-r-NyqXDutrnLZTPzmtDXjkRpIrbp8Rd-EhS2us0kPAdTGFnHgdC4IUrMtK5H-ifD73BQO_smdmFR9et0yhPaszJLIrvFgPalIcG6JdLCM94eZYahDzMlEgrWLvRu-Uk9lTxuu5c_SncOQ_lQ6CHZCslBM5Gd7RwtyPhcsDbUfd_ax7vQdYUYWQNtfsBRaiXJs_acXKdwf5WBi-ymml4g28B5NTkrWXyNq9p2DZnP4_a7LdXTamhthomG-GrVQzB8788emmYquK50Ucn0AOzxYSrosJJMZBDAIJFAgMBAAE",
+      "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA4EnoiBthkAkY4r10dD3B\nKv1g1EYdzA0Rj3MAWktb+6+pQuY/kAiR9EyGEOPEZst34Se0LFkw0Y0IgIbdJUdc\n7kBGZ02RN2e5uq7xp8cyPlp1kmrmoFycqBmKIpjCZnmOeNfNU88sEl/0mXbSR89E\nz52ezUSbXg5K4m1+W8zJHUPzTIx3VcURWb4FfvpFcPqeZySbJBeqd9DlxCfl8rE7\ntEOZDuBC+r+NyqXDutrnLZTPzmtDXjkRpIrbp8Rd+EhS2us0kPAdTGFnHgdC4IUr\nMtK5H+ifD73BQO/smdmFR9et0yhPaszJLIrvFgPalIcG6JdLCM94eZYahDzMlEgr\nWLvRu+Uk9lTxuu5c/SncOQ/lQ6CHZCslBM5Gd7RwtyPhcsDbUfd/ax7vQdYUYWQN\ntfsBRaiXJs/acXKdwf5WBi+ymml4g28B5NTkrWXyNq9p2DZnP4/a7LdXTamhthom\nG+GrVQzB8788emmYquK50Ucn0AOzxYSrosJJMZBDAIJFAgMBAAE=\n-----END PUBLIC KEY-----\n",
+      "privateKeyPkcs8Pem": "-----BEGIN PRIVATE KEY-----\n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\nPg3Wj+nADv3zMhN3bfCdKogw\n-----END PRIVATE KEY-----\n"
+    },
+    "large_device": {
+      "keyId": "device-rsa4096",
+      "algorithm": "PS256",
+      "keyType": "RSA-4096",
+      "deviceId": "e4ca08dce6d45fbc9eaa3c45cfdc4d4684eb6ed43022f875594a5341430069c9",
+      "publicKeySpkiDerBase64Url": "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAwDQYC7GiljXz1Xhk9M8V-PEVfoEw6ZoBNJzwAr_lDFWA3xdo5EkFt7kbEHs2_qv6rCMEPkvtco04H1tEdi1_Oy80lpC7Hs8WdqrAsGs7nUwhnZtrE6euXf4nb9GUmJkTDhVgKYA6g4Ox64ogT1-7j-h1oY8DHXQ7aA_7YpLHnY-EerRNtTS5QdweXEwee5JyXDrIlxYUbvHRstndDHrLnpmH6dCIrbByeDRfukr5AS07bKRZ7HrHr2zIqexiTuDSCeSRV3ctM8h9gJm6Q-8cDx6evB7IVwpVzk3CMa_AhA_6zGi1_F4_FJ37HUywEZYMlNmQRocn6C7H31f9gBYeL9dJtodMb3d2X7457mOIkLufP5953JLmMcG9czIr0m3eCRwe7zIyZRVRxp682zWs95HG04bUe78E15bSicajSYp9fv8Q6AisXej8fJcvzs45GYt9l58E3Lvpk2YC1tjNCl4vuvS0qVl7GlqlpQbip2vSmz-LPxvv7UpFSNH6-pKuA9qAkCm9HVwMl4q8e6k51mbrJhbcEO2fLU33rQwOhxyn0IdI_cJBpoQzZ1AfIhLuVSxUER6lfXEDxBlaoRLRHS_qFFM9T7akWUkmJtvasNMK5JcAxwlHa91NtZgdKt5XvM3eVTXzMjSEKB6mNVQA-jiH0Ag0reN2PGSa83YzhjkCAwEAAQ",
+      "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAwDQYC7GiljXz1Xhk9M8V\n+PEVfoEw6ZoBNJzwAr/lDFWA3xdo5EkFt7kbEHs2/qv6rCMEPkvtco04H1tEdi1/\nOy80lpC7Hs8WdqrAsGs7nUwhnZtrE6euXf4nb9GUmJkTDhVgKYA6g4Ox64ogT1+7\nj+h1oY8DHXQ7aA/7YpLHnY+EerRNtTS5QdweXEwee5JyXDrIlxYUbvHRstndDHrL\nnpmH6dCIrbByeDRfukr5AS07bKRZ7HrHr2zIqexiTuDSCeSRV3ctM8h9gJm6Q+8c\nDx6evB7IVwpVzk3CMa/AhA/6zGi1/F4/FJ37HUywEZYMlNmQRocn6C7H31f9gBYe\nL9dJtodMb3d2X7457mOIkLufP5953JLmMcG9czIr0m3eCRwe7zIyZRVRxp682zWs\n95HG04bUe78E15bSicajSYp9fv8Q6AisXej8fJcvzs45GYt9l58E3Lvpk2YC1tjN\nCl4vuvS0qVl7GlqlpQbip2vSmz+LPxvv7UpFSNH6+pKuA9qAkCm9HVwMl4q8e6k5\n1mbrJhbcEO2fLU33rQwOhxyn0IdI/cJBpoQzZ1AfIhLuVSxUER6lfXEDxBlaoRLR\nHS/qFFM9T7akWUkmJtvasNMK5JcAxwlHa91NtZgdKt5XvM3eVTXzMjSEKB6mNVQA\n+jiH0Ag0reN2PGSa83YzhjkCAwEAAQ==\n-----END PUBLIC KEY-----\n",
+      "privateKeyPkcs8Pem": "-----BEGIN PRIVATE KEY-----\n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\nYUBC2hV8XMSW/vkl93k4m3NFHXtY8s4=\n-----END PRIVATE KEY-----\n"
+    },
+    "other_device": {
+      "keyId": "device-other-rsa3072",
+      "algorithm": "PS256",
+      "keyType": "RSA-3072",
+      "deviceId": "56c3cc80349c6da2e3c53b52674a6b514800f58313248531b8723acca5df625d",
+      "publicKeySpkiDerBase64Url": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAmYTYKZHL8QSIfht0d28HZ5aMX1L1GeKDBJnbiL877F3tauRBY96ggVedOYfPyGxP1fFc6vzWPDyuIce_gzsq_Fh3qGMHnxyAtofhJ9TrnPOGWCLDOLK7Bp-laKNF52c17Ar6NvOcFLmFTvscbaNACg2vO-Csa0PosS1C3QzRIxiP0RmuA4AcfyMho4NU8S0OTcbzr0TUC_Vulv3eW-Yrc_FqwWORgGwoPi0IN19BBkcU3k30oYoBoxWuswkkPl6ZahU4zBBFcQ1CBEXaySrBGgG64fb9i4H03TW00h4RVUNz_yez0KJymJOPf8WX12Dp76pwpSxbKUgP6qXNWzUwStzVjtzzYtN6WppszoRcI6M470NUUvjV4co7-YUwTIKkSje48XpFmW4OL5DojJnZcjNuUPsfs-W4A7jLAP_Sp4cikEQaVchdlRPlvPmIM6_VDMJNOAWwA8Fh5fM_jnufoq--xc677FMv8-HNeJBjeL4ecaPqzZGKPzidHE_wRvT9AgMBAAE",
+      "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAmYTYKZHL8QSIfht0d28H\nZ5aMX1L1GeKDBJnbiL877F3tauRBY96ggVedOYfPyGxP1fFc6vzWPDyuIce/gzsq\n/Fh3qGMHnxyAtofhJ9TrnPOGWCLDOLK7Bp+laKNF52c17Ar6NvOcFLmFTvscbaNA\nCg2vO+Csa0PosS1C3QzRIxiP0RmuA4AcfyMho4NU8S0OTcbzr0TUC/Vulv3eW+Yr\nc/FqwWORgGwoPi0IN19BBkcU3k30oYoBoxWuswkkPl6ZahU4zBBFcQ1CBEXaySrB\nGgG64fb9i4H03TW00h4RVUNz/yez0KJymJOPf8WX12Dp76pwpSxbKUgP6qXNWzUw\nStzVjtzzYtN6WppszoRcI6M470NUUvjV4co7+YUwTIKkSje48XpFmW4OL5DojJnZ\ncjNuUPsfs+W4A7jLAP/Sp4cikEQaVchdlRPlvPmIM6/VDMJNOAWwA8Fh5fM/jnuf\noq++xc677FMv8+HNeJBjeL4ecaPqzZGKPzidHE/wRvT9AgMBAAE=\n-----END PUBLIC KEY-----\n",
+      "privateKeyPkcs8Pem": "-----BEGIN PRIVATE KEY-----\n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\n/4HUlovdlWHdWhI4d9es6PS1\n-----END PRIVATE KEY-----\n"
+    }
+  },
+  "positiveVectors": [
+    {
+      "id": "pos_01_ps256_with_token_json_body",
+      "description": "Modern PS256 signature with active bearer access token and standard JSON body",
+      "keyRef": "modern_device",
+      "algorithm": "PS256",
+      "inputs": {
+        "method": "POST",
+        "path": "/v1/profiles",
+        "timestamp": 1700000000,
+        "nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "accessToken": "hkvpn_acc_9876543210abcdef9876543210abcdef",
+        "rawBody": "{\"selectedNode\":\"node-de-01\",\"rulesVersion\":1,\"clientOperationId\":\"op-enroll-001\"}"
+      },
+      "intermediate": {
+        "deviceId": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+        "tokenHash": "c9c5a630785fb7e50035afbcb57ec3993b4ce48071c07d39367f21e4061e1a7b",
+        "bodyHash": "91d3b946ba9d58c773c17d7a22d065e5acfd449381a8f02908aecf3a8a2a3690",
+        "canonicalPayload": "v1\nPOST\n/v1/profiles\n1700000000\nMDEyMzQ1Njc4OWFiY2RlZg\n9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe\nc9c5a630785fb7e50035afbcb57ec3993b4ce48071c07d39367f21e4061e1a7b\n91d3b946ba9d58c773c17d7a22d065e5acfd449381a8f02908aecf3a8a2a3690",
+        "canonicalSha256Hex": "fd7f04464d3925edbd9c31a67ed3a6371fb70a6e2f77c94e9e23194256194943"
+      },
+      "outputs": {
+        "signature": "SqaZFfIq5BNt4m4Lx71w54dVh1cntqIKTbgX0yvpSRfGt_BX7dYZG6PsA3GcILjt_h4fYCaM_xV4vofAfZ_weURrzsSZqbQnqemXGd-QEou6ocDnCGO9OOtarsiB1ihO0o9fmR5UwlRMttAtrxuGue4iG3RmocRfKjWFnjJDK0qdXz6Q9__rHdJktlfECYjKmj-sV6JcXcj9-6WMl6O2LDIIv1Ih-MbeXIOO50k6EICxBEMBaQS9TBxJOCW15a-1BjV5Oj-MzJVo9AkxgkDI6qt8AHCQz4OBNh2hFzF2nzQYxJ3YCo-GFUIV95IAgBLEMFxcH6z8_skKuOKy-4de1-aDln-J-_7hql82d21LispqH3aqzRXjANw83t6C5W54wM6s8bw_ZEVStz4xdKY8hn-uxKfRcJwSoHzGFZ00cMIUNrUIsAVUmWdJrGe2uaPXeR9aSG2sfBRm2Mbutb1v7gUl7OxID3iu5Tyto7X21e1R9OomEElNZXEJOEL9vxD7",
+        "headers": {
+          "X-HKVPN-Device-Id": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+          "X-HKVPN-Timestamp": "1700000000",
+          "X-HKVPN-Nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+          "X-HKVPN-Signature": "SqaZFfIq5BNt4m4Lx71w54dVh1cntqIKTbgX0yvpSRfGt_BX7dYZG6PsA3GcILjt_h4fYCaM_xV4vofAfZ_weURrzsSZqbQnqemXGd-QEou6ocDnCGO9OOtarsiB1ihO0o9fmR5UwlRMttAtrxuGue4iG3RmocRfKjWFnjJDK0qdXz6Q9__rHdJktlfECYjKmj-sV6JcXcj9-6WMl6O2LDIIv1Ih-MbeXIOO50k6EICxBEMBaQS9TBxJOCW15a-1BjV5Oj-MzJVo9AkxgkDI6qt8AHCQz4OBNh2hFzF2nzQYxJ3YCo-GFUIV95IAgBLEMFxcH6z8_skKuOKy-4de1-aDln-J-_7hql82d21LispqH3aqzRXjANw83t6C5W54wM6s8bw_ZEVStz4xdKY8hn-uxKfRcJwSoHzGFZ00cMIUNrUIsAVUmWdJrGe2uaPXeR9aSG2sfBRm2Mbutb1v7gUl7OxID3iu5Tyto7X21e1R9OomEElNZXEJOEL9vxD7",
+          "X-HKVPN-Algorithm": "PS256",
+          "Authorization": "Bearer hkvpn_acc_9876543210abcdef9876543210abcdef"
+        }
+      }
+    },
+    {
+      "id": "pos_02_ps256_no_token_json_body",
+      "description": "Modern PS256 signature without access token (token hash = empty string hash) and JSON body",
+      "keyRef": "modern_device",
+      "algorithm": "PS256",
+      "inputs": {
+        "method": "POST",
+        "path": "/v1/devices/complete",
+        "timestamp": 1700000001,
+        "nonce": "YWIxMmNkMzRlZjU2Z2g3OA",
+        "accessToken": null,
+        "rawBody": "{\"challengeId\":\"ch_1234567890\",\"clientOperationId\":\"op-complete-001\"}"
+      },
+      "intermediate": {
+        "deviceId": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+        "tokenHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bodyHash": "1b440009b0a03ec284602adf739d26eb9a84095819d39c9a6f9e790dfbf159bd",
+        "canonicalPayload": "v1\nPOST\n/v1/devices/complete\n1700000001\nYWIxMmNkMzRlZjU2Z2g3OA\n9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\n1b440009b0a03ec284602adf739d26eb9a84095819d39c9a6f9e790dfbf159bd",
+        "canonicalSha256Hex": "1123020c1ff73f9da610c7f9a6b788fa08111655f0cbabbeef57ad30125d9b0b"
+      },
+      "outputs": {
+        "signature": "l-sGunejwjJeKDMawAIF7PJou5higpEZDmk32u4pX0u856l8DTH8AF8UG_APduxVPhTzslNaKI4OLRQJgo_2n7VMg_t4motu2VybwX7JmBv-FQVTVfldrCPGsVqPHC9OCwCOOQDJuMmA4rgCUEa2QDlgSGL1MFwwU46vhcUnZ8xXjdoZ5BPf3_AngGDao49XbH4SX2fTOUFBzWprse4GzT83-esknf1eebV6FztAbVVEZbanEuHkeTTePieGOk8LxDpHmYRFLcRmC42bFx7-KxkIOcw2SBlGx5f6uqb_BjkzGeVU2uisNG1ZkHVlUPKs1C4GOY2eJeHVTbwR_1wDCTC0a2NgCJ3xIAhkr0Zp-BAutv_yst5N4nhQ9Xx-srK2ebVgH_EFUEpOjPHZGyej-dSpcNwW_ZdqbE9W-hNQINi3vvwI3ikOjLMKB9itdC1jJdVPzMpy7B7MewUmdqWDkWiGRvUyE0guGhSvg1gNjx7JbvZZqsXndtSdpaqWgqZR",
+        "headers": {
+          "X-HKVPN-Device-Id": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+          "X-HKVPN-Timestamp": "1700000001",
+          "X-HKVPN-Nonce": "YWIxMmNkMzRlZjU2Z2g3OA",
+          "X-HKVPN-Signature": "l-sGunejwjJeKDMawAIF7PJou5higpEZDmk32u4pX0u856l8DTH8AF8UG_APduxVPhTzslNaKI4OLRQJgo_2n7VMg_t4motu2VybwX7JmBv-FQVTVfldrCPGsVqPHC9OCwCOOQDJuMmA4rgCUEa2QDlgSGL1MFwwU46vhcUnZ8xXjdoZ5BPf3_AngGDao49XbH4SX2fTOUFBzWprse4GzT83-esknf1eebV6FztAbVVEZbanEuHkeTTePieGOk8LxDpHmYRFLcRmC42bFx7-KxkIOcw2SBlGx5f6uqb_BjkzGeVU2uisNG1ZkHVlUPKs1C4GOY2eJeHVTbwR_1wDCTC0a2NgCJ3xIAhkr0Zp-BAutv_yst5N4nhQ9Xx-srK2ebVgH_EFUEpOjPHZGyej-dSpcNwW_ZdqbE9W-hNQINi3vvwI3ikOjLMKB9itdC1jJdVPzMpy7B7MewUmdqWDkWiGRvUyE0guGhSvg1gNjx7JbvZZqsXndtSdpaqWgqZR",
+          "X-HKVPN-Algorithm": "PS256"
+        }
+      }
+    },
+    {
+      "id": "pos_03_ps256_empty_body_with_token",
+      "description": "Modern PS256 signature with access token and empty body (GET /v1/servers)",
+      "keyRef": "modern_device",
+      "algorithm": "PS256",
+      "inputs": {
+        "method": "GET",
+        "path": "/v1/servers",
+        "timestamp": 1700000002,
+        "nonce": "c3JjMDk4NzY1NDMyMWFiY2Q",
+        "accessToken": "hkvpn_acc_9876543210abcdef9876543210abcdef",
+        "rawBody": ""
+      },
+      "intermediate": {
+        "deviceId": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+        "tokenHash": "c9c5a630785fb7e50035afbcb57ec3993b4ce48071c07d39367f21e4061e1a7b",
+        "bodyHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "canonicalPayload": "v1\nGET\n/v1/servers\n1700000002\nc3JjMDk4NzY1NDMyMWFiY2Q\n9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe\nc9c5a630785fb7e50035afbcb57ec3993b4ce48071c07d39367f21e4061e1a7b\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "canonicalSha256Hex": "35e79827121cdc2ce5d479f4a4471fc8d1adb2dbab1c06be33d60bffaacafe21"
+      },
+      "outputs": {
+        "signature": "H_kbvgFl6ibjjq5IBDnMhjo0JK-P47hRFTxffbRMJ6_73xZGei9B4PuIiSVDp2fl_ZoIlZgXOB-rLDy-AHyyJphHseOe_NOaovO0ehSTF6nbXQhdSQJbFHcrLT3YnFmcLmoeLn00W1GCjgM-wkt3V7x-Nli-a9qiKbfZAxYy9WAIzvd6VMa0_dfn-xrtyaWa3k1wCDdHeegCEDK3JqMl8lkRnwrF6NC0zKdnnGmiOjl5KSzP4VGLK3EFhxS2zJsLWF4nWGyrWgLmz8mky9qDaCArOG3Rganip-0K1trR7lO8Efv3uojQjmlEEoI4DJUtb23308gj6Ow0LL4GAgQmT3YhE9SM6q2oOXmmztLlvcEOHGKCh7nA529kF9QN4_7KjnNINXmFMcavjwHJybOny7Ie8PhrMZ3a1J2v9D7IZ2RG5sR8O-fP2vol2SY5Nmz6RKTD3aT-HxlUZGdvdFNQBGPkud-blE-S1JMWSDTYH4SMhmpviuT1nDzXHHtymccv",
+        "headers": {
+          "X-HKVPN-Device-Id": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+          "X-HKVPN-Timestamp": "1700000002",
+          "X-HKVPN-Nonce": "c3JjMDk4NzY1NDMyMWFiY2Q",
+          "X-HKVPN-Signature": "H_kbvgFl6ibjjq5IBDnMhjo0JK-P47hRFTxffbRMJ6_73xZGei9B4PuIiSVDp2fl_ZoIlZgXOB-rLDy-AHyyJphHseOe_NOaovO0ehSTF6nbXQhdSQJbFHcrLT3YnFmcLmoeLn00W1GCjgM-wkt3V7x-Nli-a9qiKbfZAxYy9WAIzvd6VMa0_dfn-xrtyaWa3k1wCDdHeegCEDK3JqMl8lkRnwrF6NC0zKdnnGmiOjl5KSzP4VGLK3EFhxS2zJsLWF4nWGyrWgLmz8mky9qDaCArOG3Rganip-0K1trR7lO8Efv3uojQjmlEEoI4DJUtb23308gj6Ow0LL4GAgQmT3YhE9SM6q2oOXmmztLlvcEOHGKCh7nA529kF9QN4_7KjnNINXmFMcavjwHJybOny7Ie8PhrMZ3a1J2v9D7IZ2RG5sR8O-fP2vol2SY5Nmz6RKTD3aT-HxlUZGdvdFNQBGPkud-blE-S1JMWSDTYH4SMhmpviuT1nDzXHHtymccv",
+          "X-HKVPN-Algorithm": "PS256",
+          "Authorization": "Bearer hkvpn_acc_9876543210abcdef9876543210abcdef"
+        }
+      }
+    },
+    {
+      "id": "pos_04_ps256_empty_body_no_token",
+      "description": "Modern PS256 signature without access token and empty body (DELETE /v1/devices/me)",
+      "keyRef": "modern_device",
+      "algorithm": "PS256",
+      "inputs": {
+        "method": "DELETE",
+        "path": "/v1/devices/me",
+        "timestamp": 1700000003,
+        "nonce": "ZGVsdGVtZTAxMjM0NTY3ODk",
+        "accessToken": null,
+        "rawBody": ""
+      },
+      "intermediate": {
+        "deviceId": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+        "tokenHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bodyHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "canonicalPayload": "v1\nDELETE\n/v1/devices/me\n1700000003\nZGVsdGVtZTAxMjM0NTY3ODk\n9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "canonicalSha256Hex": "6dfa6f4edc885a04c68389d60f346e3492d39231d78644831c38988a0af8b261"
+      },
+      "outputs": {
+        "signature": "SUhRe2PEltBkvNT_rJbsfz7d4smANjAxPtIeHOKREX9q1tPNfZ8Pw-eYfwmFoRMB2WQnwegMZm8p0p72wjS-kvC9jReO4SQAp8V_Q84e_6x4uaq7gv67StlzU-afvDSQJLXdnWF5rE2-HQKpZ5lrD2_Rvzo5Nv0xQLAhSoIG_IPui5vX05jJeAy3gUWYBW-s6WBA66Q8fsT84MC3c77YSVISq8LfkxX8RwOw-A-VcQN5EqjX3jaNPeaEik1u6J66j2MTA3Ya2XFMa1qRi8hDVMhVbLfpShX5HgUvcYuZy3EIjlru51X1oPzd-wbjlVFayN76GwPqzwbH-rq-K4ALXwpzr6GlMUDjhLJtzyFM3MGr68HS2yNRfUnidd4QeNCd8qNU2RreT3uRDXoieRxljhlWmM1fA_Ybl2NSiA4fQ8ubo6IaPObTgvJDa58PwJkGAlbnVKx3U8LDReuVdxSxIUTj-lMy4dA28Zz5niL-VSiEjGzMePGpXPpzcl_50ADV",
+        "headers": {
+          "X-HKVPN-Device-Id": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+          "X-HKVPN-Timestamp": "1700000003",
+          "X-HKVPN-Nonce": "ZGVsdGVtZTAxMjM0NTY3ODk",
+          "X-HKVPN-Signature": "SUhRe2PEltBkvNT_rJbsfz7d4smANjAxPtIeHOKREX9q1tPNfZ8Pw-eYfwmFoRMB2WQnwegMZm8p0p72wjS-kvC9jReO4SQAp8V_Q84e_6x4uaq7gv67StlzU-afvDSQJLXdnWF5rE2-HQKpZ5lrD2_Rvzo5Nv0xQLAhSoIG_IPui5vX05jJeAy3gUWYBW-s6WBA66Q8fsT84MC3c77YSVISq8LfkxX8RwOw-A-VcQN5EqjX3jaNPeaEik1u6J66j2MTA3Ya2XFMa1qRi8hDVMhVbLfpShX5HgUvcYuZy3EIjlru51X1oPzd-wbjlVFayN76GwPqzwbH-rq-K4ALXwpzr6GlMUDjhLJtzyFM3MGr68HS2yNRfUnidd4QeNCd8qNU2RreT3uRDXoieRxljhlWmM1fA_Ybl2NSiA4fQ8ubo6IaPObTgvJDa58PwJkGAlbnVKx3U8LDReuVdxSxIUTj-lMy4dA28Zz5niL-VSiEjGzMePGpXPpzcl_50ADV",
+          "X-HKVPN-Algorithm": "PS256"
+        }
+      }
+    },
+    {
+      "id": "pos_05_ps256_percent_encoded_path",
+      "description": "Modern PS256 signature with percent-encoded path segment without query",
+      "keyRef": "modern_device",
+      "algorithm": "PS256",
+      "inputs": {
+        "method": "GET",
+        "path": "/v1/operations/%7Bop-uuid-1234-abcd%7D",
+        "timestamp": 1700000004,
+        "nonce": "cGVyY2VudGVuY29kZWQxMjM",
+        "accessToken": "hkvpn_acc_9876543210abcdef9876543210abcdef",
+        "rawBody": ""
+      },
+      "intermediate": {
+        "deviceId": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+        "tokenHash": "c9c5a630785fb7e50035afbcb57ec3993b4ce48071c07d39367f21e4061e1a7b",
+        "bodyHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "canonicalPayload": "v1\nGET\n/v1/operations/%7Bop-uuid-1234-abcd%7D\n1700000004\ncGVyY2VudGVuY29kZWQxMjM\n9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe\nc9c5a630785fb7e50035afbcb57ec3993b4ce48071c07d39367f21e4061e1a7b\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "canonicalSha256Hex": "627eca4aa1537c4500a660156c73c6503381f1ff4521dc21906bdbfff0098e6d"
+      },
+      "outputs": {
+        "signature": "ZT5S3Wv0EJHeRoh3kWsDPrXRf3zSsoSC7IFER1Xd3uSDnwG0P8iPmB4-BARq4gE4EhLjPZhvwe_mn6EzmxiNuj0v7yCtv275CWBy-ylfR99HWePW_GIXzNKHcyT5wjtnYIrRngspPB_uCjaAbetac3bmUtQ-Icp5ZfZGp2ExW_S7b5xOVokFx_eRtx2oNrEVkR5NsA_wopcvoOpcl8ZM1a47xyuAe-zqNzUkkivTmN8_JwHXc1FsGttS7UbfLiMQfFPa1zIHIok5XBTDllR-O4l3CPQKJYEDzKRfi2TXVLVZk5YsM9tlHwO_Z7x9H2JpPW3GPct-wKSq1IEswgP6EAsmA5fNfdl39oe_ZcFNf2yJ_SkrSamdl6J1h2Sz6MB5XdNtaaciVXMVKPBziVpttQsHXIIKhlpoa90iN2KX9w-NY8KxrMVVM5RcoioCbXGziVGy04vv_oT0cUbP1YVhw6-6HVGQolunwE0eAlBdZovJz-3injxm0rnvJNzrtxW-",
+        "headers": {
+          "X-HKVPN-Device-Id": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+          "X-HKVPN-Timestamp": "1700000004",
+          "X-HKVPN-Nonce": "cGVyY2VudGVuY29kZWQxMjM",
+          "X-HKVPN-Signature": "ZT5S3Wv0EJHeRoh3kWsDPrXRf3zSsoSC7IFER1Xd3uSDnwG0P8iPmB4-BARq4gE4EhLjPZhvwe_mn6EzmxiNuj0v7yCtv275CWBy-ylfR99HWePW_GIXzNKHcyT5wjtnYIrRngspPB_uCjaAbetac3bmUtQ-Icp5ZfZGp2ExW_S7b5xOVokFx_eRtx2oNrEVkR5NsA_wopcvoOpcl8ZM1a47xyuAe-zqNzUkkivTmN8_JwHXc1FsGttS7UbfLiMQfFPa1zIHIok5XBTDllR-O4l3CPQKJYEDzKRfi2TXVLVZk5YsM9tlHwO_Z7x9H2JpPW3GPct-wKSq1IEswgP6EAsmA5fNfdl39oe_ZcFNf2yJ_SkrSamdl6J1h2Sz6MB5XdNtaaciVXMVKPBziVpttQsHXIIKhlpoa90iN2KX9w-NY8KxrMVVM5RcoioCbXGziVGy04vv_oT0cUbP1YVhw6-6HVGQolunwE0eAlBdZovJz-3injxm0rnvJNzrtxW-",
+          "X-HKVPN-Algorithm": "PS256",
+          "Authorization": "Bearer hkvpn_acc_9876543210abcdef9876543210abcdef"
+        }
+      }
+    },
+    {
+      "id": "pos_06_rs256_with_token_json_body",
+      "description": "Legacy RS256 signature with access token and JSON body",
+      "keyRef": "legacy_device",
+      "algorithm": "RS256",
+      "inputs": {
+        "method": "POST",
+        "path": "/v1/profiles",
+        "timestamp": 1700000005,
+        "nonce": "bGVnYWN5cnMyNTZub25jZTA",
+        "accessToken": "hkvpn_acc_legacy_1111222233334444",
+        "rawBody": "{\"selectedNode\":\"node-nl-02\",\"rulesVersion\":2,\"clientOperationId\":\"op-leg-001\"}"
+      },
+      "intermediate": {
+        "deviceId": "b1cc40d997b926c867ce5390fcf6bca917c0479062ef509ca1c27d9d11c21100",
+        "tokenHash": "7450abb7d6095d228f3df9cb7ab7c1460b6276dea2c9d40df6f049bec5a96f4d",
+        "bodyHash": "68fd78998dabcf8a557dfa866542fb1f4823ac25962e5cc16b9944d1ca96a53a",
+        "canonicalPayload": "v1\nPOST\n/v1/profiles\n1700000005\nbGVnYWN5cnMyNTZub25jZTA\nb1cc40d997b926c867ce5390fcf6bca917c0479062ef509ca1c27d9d11c21100\n7450abb7d6095d228f3df9cb7ab7c1460b6276dea2c9d40df6f049bec5a96f4d\n68fd78998dabcf8a557dfa866542fb1f4823ac25962e5cc16b9944d1ca96a53a",
+        "canonicalSha256Hex": "8ecb254ff32eb601a7b685d8e3fec7b3fc5564a4fad8c87f88d3b1bd46d05fea"
+      },
+      "outputs": {
+        "signature": "HP61pAgrq7LDUte9CzMsb27lwOeWFjfCEIvkAyKXtXAn254RQOXh4ivls-eOPLXuMeEEVE6xqeRdiUBR5qV3I2rqI_wcFPoP8Nu2lm3LsD13_TjuLNEytuIUyId0YoTI7CIRcXJNk7qxEsPwB8XfHnkSlaA6uG3nbcv8ursCKnXGjEgpRAik615jR30_iUuuXBRR0f52x1xH6vaPPv8T0FprqnXOgBmExqH9Oxl8p8QWBmNVVb0ZXl0Y3k5drR2-NxT2PUgcnT3r23-SI0zMmXt-nSPRgZBV5sNFAnrmfyzykBHg9qMjGWAgnkgBmN9ukTpO8KVpyWX8L8efLscGotb3SXNNMXQHrBpAR7dm6cjkbEy3Pr_MctpHUXDEUP8TbcCyBmtMyqX42ExwIbnEHpKzul2XCm41oshZ-DjgF6lw0iEU_wvLUsauaNiolCqEZsmMKt8NCi46G8BDBlT6nBpobp-J3IRc67gWUEEfE3U0P2LIk2jQF76jNd0iTIyx",
+        "headers": {
+          "X-HKVPN-Device-Id": "b1cc40d997b926c867ce5390fcf6bca917c0479062ef509ca1c27d9d11c21100",
+          "X-HKVPN-Timestamp": "1700000005",
+          "X-HKVPN-Nonce": "bGVnYWN5cnMyNTZub25jZTA",
+          "X-HKVPN-Signature": "HP61pAgrq7LDUte9CzMsb27lwOeWFjfCEIvkAyKXtXAn254RQOXh4ivls-eOPLXuMeEEVE6xqeRdiUBR5qV3I2rqI_wcFPoP8Nu2lm3LsD13_TjuLNEytuIUyId0YoTI7CIRcXJNk7qxEsPwB8XfHnkSlaA6uG3nbcv8ursCKnXGjEgpRAik615jR30_iUuuXBRR0f52x1xH6vaPPv8T0FprqnXOgBmExqH9Oxl8p8QWBmNVVb0ZXl0Y3k5drR2-NxT2PUgcnT3r23-SI0zMmXt-nSPRgZBV5sNFAnrmfyzykBHg9qMjGWAgnkgBmN9ukTpO8KVpyWX8L8efLscGotb3SXNNMXQHrBpAR7dm6cjkbEy3Pr_MctpHUXDEUP8TbcCyBmtMyqX42ExwIbnEHpKzul2XCm41oshZ-DjgF6lw0iEU_wvLUsauaNiolCqEZsmMKt8NCi46G8BDBlT6nBpobp-J3IRc67gWUEEfE3U0P2LIk2jQF76jNd0iTIyx",
+          "X-HKVPN-Algorithm": "RS256",
+          "Authorization": "Bearer hkvpn_acc_legacy_1111222233334444"
+        }
+      }
+    },
+    {
+      "id": "pos_07_rs256_no_token_json_body",
+      "description": "Legacy RS256 signature without access token (refresh request)",
+      "keyRef": "legacy_device",
+      "algorithm": "RS256",
+      "inputs": {
+        "method": "POST",
+        "path": "/v1/tokens/refresh",
+        "timestamp": 1700000006,
+        "nonce": "cmVmcmVzaG5vbmNlMTIzNDU",
+        "accessToken": null,
+        "rawBody": "{\"refreshToken\":\"hkvpn_ref_legacy_555566667777\",\"clientOperationId\":\"op-ref-001\"}"
+      },
+      "intermediate": {
+        "deviceId": "b1cc40d997b926c867ce5390fcf6bca917c0479062ef509ca1c27d9d11c21100",
+        "tokenHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bodyHash": "34f0aaabe6ed2d79ba11f6584189496b765216ea94749715117b5b184d1f2765",
+        "canonicalPayload": "v1\nPOST\n/v1/tokens/refresh\n1700000006\ncmVmcmVzaG5vbmNlMTIzNDU\nb1cc40d997b926c867ce5390fcf6bca917c0479062ef509ca1c27d9d11c21100\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\n34f0aaabe6ed2d79ba11f6584189496b765216ea94749715117b5b184d1f2765",
+        "canonicalSha256Hex": "a944161723a09d87d4dd189da84baec1cea0d0d5a53dd3017efc88c652e6f3b1"
+      },
+      "outputs": {
+        "signature": "O-NJbJbyezZAc6_aeXP4P6GTSaIv6QpWSyEPWntK3fxBdG1cCfWmxp-4MVf3dNZMBJ1CO7Sd31mKvMVMish38S4S7azS-cyLT4Uck8rXn9r-mqQoCV3Oj_7PxyA9THNzubWThSR512Si7hg0TMTquSug6pxdJ-sWdKnOcxfRiWT4J0CrwRj1Lhxs91n7MS56lD4ProTRP19blseXN5-ZccWARqT_wnjWT4BSo37z8nzXSEKZWpP5093YkXCQTP3E5LGsSY6ot0pbYZayrfsMRhvz7Ovnhb9OZItAvN_kw_Nf-mBec8qxtihFBeGN0Je-GKadiVeUO3XKGOy4qzjKDjzyJ826sePe-iUJTCwPMEnXEm421Xt5WZhXJCxeVjT_txvqxguUrNkpXOu2aRhNHLY_yqEF0wNcuDa9zrQLXx48vDf3ysmQ6TGvymMsclzFzvdSrx5tTMHHpeoDrQr9ccQEGry_O9N89aOJoa9rV_l_ixTC-VeZ3rsQTsXWuYFN",
+        "headers": {
+          "X-HKVPN-Device-Id": "b1cc40d997b926c867ce5390fcf6bca917c0479062ef509ca1c27d9d11c21100",
+          "X-HKVPN-Timestamp": "1700000006",
+          "X-HKVPN-Nonce": "cmVmcmVzaG5vbmNlMTIzNDU",
+          "X-HKVPN-Signature": "O-NJbJbyezZAc6_aeXP4P6GTSaIv6QpWSyEPWntK3fxBdG1cCfWmxp-4MVf3dNZMBJ1CO7Sd31mKvMVMish38S4S7azS-cyLT4Uck8rXn9r-mqQoCV3Oj_7PxyA9THNzubWThSR512Si7hg0TMTquSug6pxdJ-sWdKnOcxfRiWT4J0CrwRj1Lhxs91n7MS56lD4ProTRP19blseXN5-ZccWARqT_wnjWT4BSo37z8nzXSEKZWpP5093YkXCQTP3E5LGsSY6ot0pbYZayrfsMRhvz7Ovnhb9OZItAvN_kw_Nf-mBec8qxtihFBeGN0Je-GKadiVeUO3XKGOy4qzjKDjzyJ826sePe-iUJTCwPMEnXEm421Xt5WZhXJCxeVjT_txvqxguUrNkpXOu2aRhNHLY_yqEF0wNcuDa9zrQLXx48vDf3ysmQ6TGvymMsclzFzvdSrx5tTMHHpeoDrQr9ccQEGry_O9N89aOJoa9rV_l_ixTC-VeZ3rsQTsXWuYFN",
+          "X-HKVPN-Algorithm": "RS256"
+        }
+      }
+    },
+    {
+      "id": "pos_08_rs256_empty_body_with_token",
+      "description": "Legacy RS256 signature with access token and empty body",
+      "keyRef": "legacy_device",
+      "algorithm": "RS256",
+      "inputs": {
+        "method": "GET",
+        "path": "/v1/profiles/prf-001",
+        "timestamp": 1700000007,
+        "nonce": "Z2V0cHJvZmlsZW5vbmNlOTk",
+        "accessToken": "hkvpn_acc_legacy_1111222233334444",
+        "rawBody": ""
+      },
+      "intermediate": {
+        "deviceId": "b1cc40d997b926c867ce5390fcf6bca917c0479062ef509ca1c27d9d11c21100",
+        "tokenHash": "7450abb7d6095d228f3df9cb7ab7c1460b6276dea2c9d40df6f049bec5a96f4d",
+        "bodyHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "canonicalPayload": "v1\nGET\n/v1/profiles/prf-001\n1700000007\nZ2V0cHJvZmlsZW5vbmNlOTk\nb1cc40d997b926c867ce5390fcf6bca917c0479062ef509ca1c27d9d11c21100\n7450abb7d6095d228f3df9cb7ab7c1460b6276dea2c9d40df6f049bec5a96f4d\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "canonicalSha256Hex": "5fb7f57705d7001d349a7e3a81b3ace5087a3cb31c2ffdb15a96cb9ae80eb821"
+      },
+      "outputs": {
+        "signature": "RTh6hi79EyTnxG22L6mZfr7lmIayizuhaR4O7amGFSUabM5a2Sq9e1PpW_2lIVr_3l_Hjw6u3OyQllo5y-G--PQhrtIjELqpY1SzZH70foHHbdsMOOZ6FDcA57TwVGTXh0UTu2vka8Z3POZU52Z77qJykJxMIc-igq5H5ih8FNLFoHlzh8CvrD_0foaXfNCQXyGpyJVbnJjWiGpNg2ZCSeTAB7jG20sjtpCCwTIAntGtBhKVQrx56ORD52m40YVxHhOkogA9Ixdequ9RXaKLNhiSzIG8VSwEZQwwjYUH9h9aRoawKSiuGv73JvL865hkGM0qE7AveeP4PVtfaVbcBu1jUalMRGRw-ygz0uLO46yfwZTi0INNTziSp6ohkkgQ-5bOuR07VXGEeeATwQ_3xyIfE7PK4-ZVSTqXfNKKSkjjKS7Ogk1xwHsYtRQDfG-45-ecVyByWV0jcdRj66YOenlzJlZQwqp1KZ2KT7t3jPiHXr3AanR18Z0JS2VnkZyt",
+        "headers": {
+          "X-HKVPN-Device-Id": "b1cc40d997b926c867ce5390fcf6bca917c0479062ef509ca1c27d9d11c21100",
+          "X-HKVPN-Timestamp": "1700000007",
+          "X-HKVPN-Nonce": "Z2V0cHJvZmlsZW5vbmNlOTk",
+          "X-HKVPN-Signature": "RTh6hi79EyTnxG22L6mZfr7lmIayizuhaR4O7amGFSUabM5a2Sq9e1PpW_2lIVr_3l_Hjw6u3OyQllo5y-G--PQhrtIjELqpY1SzZH70foHHbdsMOOZ6FDcA57TwVGTXh0UTu2vka8Z3POZU52Z77qJykJxMIc-igq5H5ih8FNLFoHlzh8CvrD_0foaXfNCQXyGpyJVbnJjWiGpNg2ZCSeTAB7jG20sjtpCCwTIAntGtBhKVQrx56ORD52m40YVxHhOkogA9Ixdequ9RXaKLNhiSzIG8VSwEZQwwjYUH9h9aRoawKSiuGv73JvL865hkGM0qE7AveeP4PVtfaVbcBu1jUalMRGRw-ygz0uLO46yfwZTi0INNTziSp6ohkkgQ-5bOuR07VXGEeeATwQ_3xyIfE7PK4-ZVSTqXfNKKSkjjKS7Ogk1xwHsYtRQDfG-45-ecVyByWV0jcdRj66YOenlzJlZQwqp1KZ2KT7t3jPiHXr3AanR18Z0JS2VnkZyt",
+          "X-HKVPN-Algorithm": "RS256",
+          "Authorization": "Bearer hkvpn_acc_legacy_1111222233334444"
+        }
+      }
+    },
+    {
+      "id": "pos_09_rs256_empty_body_no_token",
+      "description": "Legacy RS256 signature without access token and empty body",
+      "keyRef": "legacy_device",
+      "algorithm": "RS256",
+      "inputs": {
+        "method": "DELETE",
+        "path": "/v1/devices/me",
+        "timestamp": 1700000008,
+        "nonce": "ZGVsZXRsZWdhY3lub25jZTA",
+        "accessToken": null,
+        "rawBody": ""
+      },
+      "intermediate": {
+        "deviceId": "b1cc40d997b926c867ce5390fcf6bca917c0479062ef509ca1c27d9d11c21100",
+        "tokenHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bodyHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "canonicalPayload": "v1\nDELETE\n/v1/devices/me\n1700000008\nZGVsZXRsZWdhY3lub25jZTA\nb1cc40d997b926c867ce5390fcf6bca917c0479062ef509ca1c27d9d11c21100\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "canonicalSha256Hex": "73131a731a5db38bf991c077b370fce66addb795e50b3bda13a613aa7c4809f9"
+      },
+      "outputs": {
+        "signature": "2j_z9ZK-MOOm6BmZiqqoiOMTnpEud4s5aLHjp2bqV0NEO0rK3B2eCxXwhaH5Idh9wO0n2jU0iuBPvT2tXH0t3in9POdpe6StZgwo-C-r4CC9KY8VBTnBX5x1-U3lMT1nkR96q2ICna2BwSG9vXMmx1szI1vf-YknYhwatHn1_aFGGXOtdm0oAXFtO-34E6tw_KKBvYKuadY4oyxmm05rPdHshB7PhnKSA9rheDRQ2QF5CXUlWl4SCCk-a_Wc2mbgPVxZiNOXuf5CsfuXm8xb4KpU3hiuceLJaqJR2v-bQPpwUuyfdvno88t2fxlKUSe7d6mb5yzqE7_FL0o24--HXcVWZJCALI4YHyY_J3LWE-yRfjdoWjewBWpMqvZxqP_w9gSoECYegPr9xBX6K6td6cSOuOYh9L-VFg6Q1GSsy_xiOWOCEzjq9rQhEnDFC76dUJPgjP38NzaN998BpHQAOJ6udLvKq8cVT7OAvHFIPbJUkgYuRpepYfr3viO5UbpQ",
+        "headers": {
+          "X-HKVPN-Device-Id": "b1cc40d997b926c867ce5390fcf6bca917c0479062ef509ca1c27d9d11c21100",
+          "X-HKVPN-Timestamp": "1700000008",
+          "X-HKVPN-Nonce": "ZGVsZXRsZWdhY3lub25jZTA",
+          "X-HKVPN-Signature": "2j_z9ZK-MOOm6BmZiqqoiOMTnpEud4s5aLHjp2bqV0NEO0rK3B2eCxXwhaH5Idh9wO0n2jU0iuBPvT2tXH0t3in9POdpe6StZgwo-C-r4CC9KY8VBTnBX5x1-U3lMT1nkR96q2ICna2BwSG9vXMmx1szI1vf-YknYhwatHn1_aFGGXOtdm0oAXFtO-34E6tw_KKBvYKuadY4oyxmm05rPdHshB7PhnKSA9rheDRQ2QF5CXUlWl4SCCk-a_Wc2mbgPVxZiNOXuf5CsfuXm8xb4KpU3hiuceLJaqJR2v-bQPpwUuyfdvno88t2fxlKUSe7d6mb5yzqE7_FL0o24--HXcVWZJCALI4YHyY_J3LWE-yRfjdoWjewBWpMqvZxqP_w9gSoECYegPr9xBX6K6td6cSOuOYh9L-VFg6Q1GSsy_xiOWOCEzjq9rQhEnDFC76dUJPgjP38NzaN998BpHQAOJ6udLvKq8cVT7OAvHFIPbJUkgYuRpepYfr3viO5UbpQ",
+          "X-HKVPN-Algorithm": "RS256"
+        }
+      }
+    },
+    {
+      "id": "pos_10_ps256_rsa4096_key",
+      "description": "Modern PS256 signature using 4096-bit RSA key",
+      "keyRef": "large_device",
+      "algorithm": "PS256",
+      "inputs": {
+        "method": "POST",
+        "path": "/v1/profiles",
+        "timestamp": 1700000009,
+        "nonce": "cnNhNDA5Nm5vbmNlMTIzNDU",
+        "accessToken": "hkvpn_acc_4096_key_test_token",
+        "rawBody": "{\"selectedNode\":\"node-de-02\",\"rulesVersion\":1,\"clientOperationId\":\"op-4096-001\"}"
+      },
+      "intermediate": {
+        "deviceId": "e4ca08dce6d45fbc9eaa3c45cfdc4d4684eb6ed43022f875594a5341430069c9",
+        "tokenHash": "d2ad030a77f5306333d9c2d1f92a050c71ae0b307b0ec4523ad32f0f72189d2f",
+        "bodyHash": "116a8f7ffce71aa296dc583c72d80f3ac32ce3a22c634cd102f86b63cad0507e",
+        "canonicalPayload": "v1\nPOST\n/v1/profiles\n1700000009\ncnNhNDA5Nm5vbmNlMTIzNDU\ne4ca08dce6d45fbc9eaa3c45cfdc4d4684eb6ed43022f875594a5341430069c9\nd2ad030a77f5306333d9c2d1f92a050c71ae0b307b0ec4523ad32f0f72189d2f\n116a8f7ffce71aa296dc583c72d80f3ac32ce3a22c634cd102f86b63cad0507e",
+        "canonicalSha256Hex": "04a48e05c4d547de9192423c2caa8e381e8499244a68b71140b8a1b1b6ef9c9b"
+      },
+      "outputs": {
+        "signature": "kMCmO6L04Z47IZFDWwvd6E5tQxiQeXE1HVpAuSg3xnbpv98LP2frxZiHed4a0yyj_uuztluhewxUOctFXCgPF2I6YurOO2KXQ3drgsKz3qoeJExKIJsUxI-Ooa5E3R9DXooDDofMtGV038RlNCVIfesKJmpxdv0DIyMsppmGv60RVwNbp-6Jr1rjwZcXByFD35KQY2JEnhzIZxdjpAbxVSXbC6xi-TONXg7_25WeGALMLhdak_7u20pg3JocJoCO8EumzyVXRFK_YxSMMyeeKUVqav5F6o9CL7eDmgDtL10dFNkhSROjfRBRAb3BAxlN2MXg_QpzmbIZOQbQkslYNKBivqD0T_uPQUyS0LferH2C8cBG1T40VexaVp8BaK8egBLzp3SH6c9QiZ-a_DxpV6afKh2Bkift4E47shVxczipf2oRpykvxc0MK3v9eHF1TEANTVB4pfmAjodci3ICrh93_CRbijJEFbhiMQdT7q3zlilDVidVl578cth0jAfu-RPJEJUg8X2QRRE8oXWGr6GRoGo-lsvmxS21V9oSj4c0cKVeEPoGTEYtfyk--Kgn4ZBildAS8-z6O_rZOGcSvbHqWq2CjnwDTSw2134TCqn63JmXq0Zp_SGLYpoKq28TJxteTIQmF9RPZtRcSVTIVirin7KrtPSyAt4MC2zH3kc",
+        "headers": {
+          "X-HKVPN-Device-Id": "e4ca08dce6d45fbc9eaa3c45cfdc4d4684eb6ed43022f875594a5341430069c9",
+          "X-HKVPN-Timestamp": "1700000009",
+          "X-HKVPN-Nonce": "cnNhNDA5Nm5vbmNlMTIzNDU",
+          "X-HKVPN-Signature": "kMCmO6L04Z47IZFDWwvd6E5tQxiQeXE1HVpAuSg3xnbpv98LP2frxZiHed4a0yyj_uuztluhewxUOctFXCgPF2I6YurOO2KXQ3drgsKz3qoeJExKIJsUxI-Ooa5E3R9DXooDDofMtGV038RlNCVIfesKJmpxdv0DIyMsppmGv60RVwNbp-6Jr1rjwZcXByFD35KQY2JEnhzIZxdjpAbxVSXbC6xi-TONXg7_25WeGALMLhdak_7u20pg3JocJoCO8EumzyVXRFK_YxSMMyeeKUVqav5F6o9CL7eDmgDtL10dFNkhSROjfRBRAb3BAxlN2MXg_QpzmbIZOQbQkslYNKBivqD0T_uPQUyS0LferH2C8cBG1T40VexaVp8BaK8egBLzp3SH6c9QiZ-a_DxpV6afKh2Bkift4E47shVxczipf2oRpykvxc0MK3v9eHF1TEANTVB4pfmAjodci3ICrh93_CRbijJEFbhiMQdT7q3zlilDVidVl578cth0jAfu-RPJEJUg8X2QRRE8oXWGr6GRoGo-lsvmxS21V9oSj4c0cKVeEPoGTEYtfyk--Kgn4ZBildAS8-z6O_rZOGcSvbHqWq2CjnwDTSw2134TCqn63JmXq0Zp_SGLYpoKq28TJxteTIQmF9RPZtRcSVTIVirin7KrtPSyAt4MC2zH3kc",
+          "X-HKVPN-Algorithm": "PS256",
+          "Authorization": "Bearer hkvpn_acc_4096_key_test_token"
+        }
+      }
+    }
+  ],
+  "negativeVectors": [
+    {
+      "id": "neg_01_method_mismatch",
+      "description": "Caller sends GET method but signature was computed for POST",
+      "type": "tampered_method",
+      "expectedError": "BAD_SIGNATURE",
+      "originalVectorId": "pos_01_ps256_with_token_json_body",
+      "tamperedInputs": {
+        "method": "GET",
+        "path": "/v1/profiles",
+        "timestamp": 1700000000,
+        "nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "accessToken": "hkvpn_acc_9876543210abcdef9876543210abcdef",
+        "rawBody": "{\"selectedNode\":\"node-de-01\",\"rulesVersion\":1,\"clientOperationId\":\"op-enroll-001\"}"
+      },
+      "presentedHeaders": {
+        "X-HKVPN-Device-Id": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+        "X-HKVPN-Timestamp": "1700000000",
+        "X-HKVPN-Nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "X-HKVPN-Signature": "SqaZFfIq5BNt4m4Lx71w54dVh1cntqIKTbgX0yvpSRfGt_BX7dYZG6PsA3GcILjt_h4fYCaM_xV4vofAfZ_weURrzsSZqbQnqemXGd-QEou6ocDnCGO9OOtarsiB1ihO0o9fmR5UwlRMttAtrxuGue4iG3RmocRfKjWFnjJDK0qdXz6Q9__rHdJktlfECYjKmj-sV6JcXcj9-6WMl6O2LDIIv1Ih-MbeXIOO50k6EICxBEMBaQS9TBxJOCW15a-1BjV5Oj-MzJVo9AkxgkDI6qt8AHCQz4OBNh2hFzF2nzQYxJ3YCo-GFUIV95IAgBLEMFxcH6z8_skKuOKy-4de1-aDln-J-_7hql82d21LispqH3aqzRXjANw83t6C5W54wM6s8bw_ZEVStz4xdKY8hn-uxKfRcJwSoHzGFZ00cMIUNrUIsAVUmWdJrGe2uaPXeR9aSG2sfBRm2Mbutb1v7gUl7OxID3iu5Tyto7X21e1R9OomEElNZXEJOEL9vxD7",
+        "X-HKVPN-Algorithm": "PS256",
+        "Authorization": "Bearer hkvpn_acc_9876543210abcdef9876543210abcdef"
+      }
+    },
+    {
+      "id": "neg_02_path_mismatch",
+      "description": "Caller alters path segment from /v1/profiles to /v1/profiles/injected",
+      "type": "tampered_path",
+      "expectedError": "BAD_SIGNATURE",
+      "originalVectorId": "pos_01_ps256_with_token_json_body",
+      "tamperedInputs": {
+        "method": "POST",
+        "path": "/v1/profiles/injected",
+        "timestamp": 1700000000,
+        "nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "accessToken": "hkvpn_acc_9876543210abcdef9876543210abcdef",
+        "rawBody": "{\"selectedNode\":\"node-de-01\",\"rulesVersion\":1,\"clientOperationId\":\"op-enroll-001\"}"
+      },
+      "presentedHeaders": {
+        "X-HKVPN-Device-Id": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+        "X-HKVPN-Timestamp": "1700000000",
+        "X-HKVPN-Nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "X-HKVPN-Signature": "SqaZFfIq5BNt4m4Lx71w54dVh1cntqIKTbgX0yvpSRfGt_BX7dYZG6PsA3GcILjt_h4fYCaM_xV4vofAfZ_weURrzsSZqbQnqemXGd-QEou6ocDnCGO9OOtarsiB1ihO0o9fmR5UwlRMttAtrxuGue4iG3RmocRfKjWFnjJDK0qdXz6Q9__rHdJktlfECYjKmj-sV6JcXcj9-6WMl6O2LDIIv1Ih-MbeXIOO50k6EICxBEMBaQS9TBxJOCW15a-1BjV5Oj-MzJVo9AkxgkDI6qt8AHCQz4OBNh2hFzF2nzQYxJ3YCo-GFUIV95IAgBLEMFxcH6z8_skKuOKy-4de1-aDln-J-_7hql82d21LispqH3aqzRXjANw83t6C5W54wM6s8bw_ZEVStz4xdKY8hn-uxKfRcJwSoHzGFZ00cMIUNrUIsAVUmWdJrGe2uaPXeR9aSG2sfBRm2Mbutb1v7gUl7OxID3iu5Tyto7X21e1R9OomEElNZXEJOEL9vxD7",
+        "X-HKVPN-Algorithm": "PS256",
+        "Authorization": "Bearer hkvpn_acc_9876543210abcdef9876543210abcdef"
+      }
+    },
+    {
+      "id": "neg_03_query_string_injected",
+      "description": "Path contains forbidden query string ?node=de-01 (query prohibited in v1)",
+      "type": "query_forbidden",
+      "expectedError": "QUERY_NOT_ALLOWED",
+      "originalVectorId": "pos_01_ps256_with_token_json_body",
+      "tamperedInputs": {
+        "method": "POST",
+        "path": "/v1/profiles?node=de-01",
+        "timestamp": 1700000000,
+        "nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "accessToken": "hkvpn_acc_9876543210abcdef9876543210abcdef",
+        "rawBody": "{\"selectedNode\":\"node-de-01\",\"rulesVersion\":1,\"clientOperationId\":\"op-enroll-001\"}"
+      },
+      "presentedHeaders": {
+        "X-HKVPN-Device-Id": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+        "X-HKVPN-Timestamp": "1700000000",
+        "X-HKVPN-Nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "X-HKVPN-Signature": "SqaZFfIq5BNt4m4Lx71w54dVh1cntqIKTbgX0yvpSRfGt_BX7dYZG6PsA3GcILjt_h4fYCaM_xV4vofAfZ_weURrzsSZqbQnqemXGd-QEou6ocDnCGO9OOtarsiB1ihO0o9fmR5UwlRMttAtrxuGue4iG3RmocRfKjWFnjJDK0qdXz6Q9__rHdJktlfECYjKmj-sV6JcXcj9-6WMl6O2LDIIv1Ih-MbeXIOO50k6EICxBEMBaQS9TBxJOCW15a-1BjV5Oj-MzJVo9AkxgkDI6qt8AHCQz4OBNh2hFzF2nzQYxJ3YCo-GFUIV95IAgBLEMFxcH6z8_skKuOKy-4de1-aDln-J-_7hql82d21LispqH3aqzRXjANw83t6C5W54wM6s8bw_ZEVStz4xdKY8hn-uxKfRcJwSoHzGFZ00cMIUNrUIsAVUmWdJrGe2uaPXeR9aSG2sfBRm2Mbutb1v7gUl7OxID3iu5Tyto7X21e1R9OomEElNZXEJOEL9vxD7",
+        "X-HKVPN-Algorithm": "PS256",
+        "Authorization": "Bearer hkvpn_acc_9876543210abcdef9876543210abcdef"
+      }
+    },
+    {
+      "id": "neg_04_expired_timestamp_past",
+      "description": "Request timestamp is outside the +-120s clock skew window (300s in the past)",
+      "type": "clock_skew_exceeded",
+      "expectedError": "CLOCK_SKEW_EXCEEDED",
+      "originalVectorId": "pos_01_ps256_with_token_json_body",
+      "tamperedInputs": {
+        "method": "POST",
+        "path": "/v1/profiles",
+        "timestamp": 1699999700,
+        "nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "accessToken": "hkvpn_acc_9876543210abcdef9876543210abcdef",
+        "rawBody": "{\"selectedNode\":\"node-de-01\",\"rulesVersion\":1,\"clientOperationId\":\"op-enroll-001\"}"
+      },
+      "presentedHeaders": {
+        "X-HKVPN-Device-Id": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+        "X-HKVPN-Timestamp": "1699999700",
+        "X-HKVPN-Nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "X-HKVPN-Signature": "SqaZFfIq5BNt4m4Lx71w54dVh1cntqIKTbgX0yvpSRfGt_BX7dYZG6PsA3GcILjt_h4fYCaM_xV4vofAfZ_weURrzsSZqbQnqemXGd-QEou6ocDnCGO9OOtarsiB1ihO0o9fmR5UwlRMttAtrxuGue4iG3RmocRfKjWFnjJDK0qdXz6Q9__rHdJktlfECYjKmj-sV6JcXcj9-6WMl6O2LDIIv1Ih-MbeXIOO50k6EICxBEMBaQS9TBxJOCW15a-1BjV5Oj-MzJVo9AkxgkDI6qt8AHCQz4OBNh2hFzF2nzQYxJ3YCo-GFUIV95IAgBLEMFxcH6z8_skKuOKy-4de1-aDln-J-_7hql82d21LispqH3aqzRXjANw83t6C5W54wM6s8bw_ZEVStz4xdKY8hn-uxKfRcJwSoHzGFZ00cMIUNrUIsAVUmWdJrGe2uaPXeR9aSG2sfBRm2Mbutb1v7gUl7OxID3iu5Tyto7X21e1R9OomEElNZXEJOEL9vxD7",
+        "X-HKVPN-Algorithm": "PS256",
+        "Authorization": "Bearer hkvpn_acc_9876543210abcdef9876543210abcdef"
+      }
+    },
+    {
+      "id": "neg_05_future_timestamp",
+      "description": "Request timestamp is outside the +-120s clock skew window (300s in the future)",
+      "type": "clock_skew_exceeded",
+      "expectedError": "CLOCK_SKEW_EXCEEDED",
+      "originalVectorId": "pos_01_ps256_with_token_json_body",
+      "tamperedInputs": {
+        "method": "POST",
+        "path": "/v1/profiles",
+        "timestamp": 1700000300,
+        "nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "accessToken": "hkvpn_acc_9876543210abcdef9876543210abcdef",
+        "rawBody": "{\"selectedNode\":\"node-de-01\",\"rulesVersion\":1,\"clientOperationId\":\"op-enroll-001\"}"
+      },
+      "presentedHeaders": {
+        "X-HKVPN-Device-Id": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+        "X-HKVPN-Timestamp": "1700000300",
+        "X-HKVPN-Nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "X-HKVPN-Signature": "SqaZFfIq5BNt4m4Lx71w54dVh1cntqIKTbgX0yvpSRfGt_BX7dYZG6PsA3GcILjt_h4fYCaM_xV4vofAfZ_weURrzsSZqbQnqemXGd-QEou6ocDnCGO9OOtarsiB1ihO0o9fmR5UwlRMttAtrxuGue4iG3RmocRfKjWFnjJDK0qdXz6Q9__rHdJktlfECYjKmj-sV6JcXcj9-6WMl6O2LDIIv1Ih-MbeXIOO50k6EICxBEMBaQS9TBxJOCW15a-1BjV5Oj-MzJVo9AkxgkDI6qt8AHCQz4OBNh2hFzF2nzQYxJ3YCo-GFUIV95IAgBLEMFxcH6z8_skKuOKy-4de1-aDln-J-_7hql82d21LispqH3aqzRXjANw83t6C5W54wM6s8bw_ZEVStz4xdKY8hn-uxKfRcJwSoHzGFZ00cMIUNrUIsAVUmWdJrGe2uaPXeR9aSG2sfBRm2Mbutb1v7gUl7OxID3iu5Tyto7X21e1R9OomEElNZXEJOEL9vxD7",
+        "X-HKVPN-Algorithm": "PS256",
+        "Authorization": "Bearer hkvpn_acc_9876543210abcdef9876543210abcdef"
+      }
+    },
+    {
+      "id": "neg_06_duplicate_nonce",
+      "description": "The exact nonce was already used by this deviceId within the 5-minute replay cache",
+      "type": "replay_detected",
+      "expectedError": "NONCE_ALREADY_USED",
+      "originalVectorId": "pos_01_ps256_with_token_json_body",
+      "tamperedInputs": {
+        "method": "POST",
+        "path": "/v1/profiles",
+        "timestamp": 1700000000,
+        "nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "accessToken": "hkvpn_acc_9876543210abcdef9876543210abcdef",
+        "rawBody": "{\"selectedNode\":\"node-de-01\",\"rulesVersion\":1,\"clientOperationId\":\"op-enroll-001\"}"
+      },
+      "presentedHeaders": {
+        "X-HKVPN-Device-Id": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+        "X-HKVPN-Timestamp": "1700000000",
+        "X-HKVPN-Nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "X-HKVPN-Signature": "SqaZFfIq5BNt4m4Lx71w54dVh1cntqIKTbgX0yvpSRfGt_BX7dYZG6PsA3GcILjt_h4fYCaM_xV4vofAfZ_weURrzsSZqbQnqemXGd-QEou6ocDnCGO9OOtarsiB1ihO0o9fmR5UwlRMttAtrxuGue4iG3RmocRfKjWFnjJDK0qdXz6Q9__rHdJktlfECYjKmj-sV6JcXcj9-6WMl6O2LDIIv1Ih-MbeXIOO50k6EICxBEMBaQS9TBxJOCW15a-1BjV5Oj-MzJVo9AkxgkDI6qt8AHCQz4OBNh2hFzF2nzQYxJ3YCo-GFUIV95IAgBLEMFxcH6z8_skKuOKy-4de1-aDln-J-_7hql82d21LispqH3aqzRXjANw83t6C5W54wM6s8bw_ZEVStz4xdKY8hn-uxKfRcJwSoHzGFZ00cMIUNrUIsAVUmWdJrGe2uaPXeR9aSG2sfBRm2Mbutb1v7gUl7OxID3iu5Tyto7X21e1R9OomEElNZXEJOEL9vxD7",
+        "X-HKVPN-Algorithm": "PS256",
+        "Authorization": "Bearer hkvpn_acc_9876543210abcdef9876543210abcdef"
+      }
+    },
+    {
+      "id": "neg_07_token_hash_mismatch",
+      "description": "Bearer token provided in header does not match the tokenHash signed by device",
+      "type": "token_mismatch",
+      "expectedError": "BAD_SIGNATURE",
+      "originalVectorId": "pos_01_ps256_with_token_json_body",
+      "tamperedInputs": {
+        "method": "POST",
+        "path": "/v1/profiles",
+        "timestamp": 1700000000,
+        "nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "accessToken": "hkvpn_acc_DIFFERENT_TOKEN_12345",
+        "rawBody": "{\"selectedNode\":\"node-de-01\",\"rulesVersion\":1,\"clientOperationId\":\"op-enroll-001\"}"
+      },
+      "presentedHeaders": {
+        "X-HKVPN-Device-Id": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+        "X-HKVPN-Timestamp": "1700000000",
+        "X-HKVPN-Nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "X-HKVPN-Signature": "SqaZFfIq5BNt4m4Lx71w54dVh1cntqIKTbgX0yvpSRfGt_BX7dYZG6PsA3GcILjt_h4fYCaM_xV4vofAfZ_weURrzsSZqbQnqemXGd-QEou6ocDnCGO9OOtarsiB1ihO0o9fmR5UwlRMttAtrxuGue4iG3RmocRfKjWFnjJDK0qdXz6Q9__rHdJktlfECYjKmj-sV6JcXcj9-6WMl6O2LDIIv1Ih-MbeXIOO50k6EICxBEMBaQS9TBxJOCW15a-1BjV5Oj-MzJVo9AkxgkDI6qt8AHCQz4OBNh2hFzF2nzQYxJ3YCo-GFUIV95IAgBLEMFxcH6z8_skKuOKy-4de1-aDln-J-_7hql82d21LispqH3aqzRXjANw83t6C5W54wM6s8bw_ZEVStz4xdKY8hn-uxKfRcJwSoHzGFZ00cMIUNrUIsAVUmWdJrGe2uaPXeR9aSG2sfBRm2Mbutb1v7gUl7OxID3iu5Tyto7X21e1R9OomEElNZXEJOEL9vxD7",
+        "X-HKVPN-Algorithm": "PS256",
+        "Authorization": "Bearer hkvpn_acc_DIFFERENT_TOKEN_12345"
+      }
+    },
+    {
+      "id": "neg_08_body_altered_reserialized",
+      "description": "JSON body altered by whitespace or key ordering (raw body hash mismatch)",
+      "type": "tampered_body",
+      "expectedError": "BAD_SIGNATURE",
+      "originalVectorId": "pos_01_ps256_with_token_json_body",
+      "tamperedInputs": {
+        "method": "POST",
+        "path": "/v1/profiles",
+        "timestamp": 1700000000,
+        "nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "accessToken": "hkvpn_acc_9876543210abcdef9876543210abcdef",
+        "rawBody": "{\"selectedNode\": \"node-de-01\", \"rulesVersion\": 1, \"clientOperationId\": \"op-enroll-001\"}"
+      },
+      "presentedHeaders": {
+        "X-HKVPN-Device-Id": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+        "X-HKVPN-Timestamp": "1700000000",
+        "X-HKVPN-Nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "X-HKVPN-Signature": "SqaZFfIq5BNt4m4Lx71w54dVh1cntqIKTbgX0yvpSRfGt_BX7dYZG6PsA3GcILjt_h4fYCaM_xV4vofAfZ_weURrzsSZqbQnqemXGd-QEou6ocDnCGO9OOtarsiB1ihO0o9fmR5UwlRMttAtrxuGue4iG3RmocRfKjWFnjJDK0qdXz6Q9__rHdJktlfECYjKmj-sV6JcXcj9-6WMl6O2LDIIv1Ih-MbeXIOO50k6EICxBEMBaQS9TBxJOCW15a-1BjV5Oj-MzJVo9AkxgkDI6qt8AHCQz4OBNh2hFzF2nzQYxJ3YCo-GFUIV95IAgBLEMFxcH6z8_skKuOKy-4de1-aDln-J-_7hql82d21LispqH3aqzRXjANw83t6C5W54wM6s8bw_ZEVStz4xdKY8hn-uxKfRcJwSoHzGFZ00cMIUNrUIsAVUmWdJrGe2uaPXeR9aSG2sfBRm2Mbutb1v7gUl7OxID3iu5Tyto7X21e1R9OomEElNZXEJOEL9vxD7",
+        "X-HKVPN-Algorithm": "PS256",
+        "Authorization": "Bearer hkvpn_acc_9876543210abcdef9876543210abcdef"
+      }
+    },
+    {
+      "id": "neg_09_wrong_algorithm",
+      "description": "Header claims RS256 but device key is PS256 (or vice versa)",
+      "type": "algorithm_mismatch",
+      "expectedError": "ALGORITHM_MISMATCH",
+      "originalVectorId": "pos_01_ps256_with_token_json_body",
+      "tamperedInputs": {
+        "method": "POST",
+        "path": "/v1/profiles",
+        "timestamp": 1700000000,
+        "nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "accessToken": "hkvpn_acc_9876543210abcdef9876543210abcdef",
+        "rawBody": "{\"selectedNode\":\"node-de-01\",\"rulesVersion\":1,\"clientOperationId\":\"op-enroll-001\"}"
+      },
+      "presentedHeaders": {
+        "X-HKVPN-Device-Id": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+        "X-HKVPN-Timestamp": "1700000000",
+        "X-HKVPN-Nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "X-HKVPN-Signature": "SqaZFfIq5BNt4m4Lx71w54dVh1cntqIKTbgX0yvpSRfGt_BX7dYZG6PsA3GcILjt_h4fYCaM_xV4vofAfZ_weURrzsSZqbQnqemXGd-QEou6ocDnCGO9OOtarsiB1ihO0o9fmR5UwlRMttAtrxuGue4iG3RmocRfKjWFnjJDK0qdXz6Q9__rHdJktlfECYjKmj-sV6JcXcj9-6WMl6O2LDIIv1Ih-MbeXIOO50k6EICxBEMBaQS9TBxJOCW15a-1BjV5Oj-MzJVo9AkxgkDI6qt8AHCQz4OBNh2hFzF2nzQYxJ3YCo-GFUIV95IAgBLEMFxcH6z8_skKuOKy-4de1-aDln-J-_7hql82d21LispqH3aqzRXjANw83t6C5W54wM6s8bw_ZEVStz4xdKY8hn-uxKfRcJwSoHzGFZ00cMIUNrUIsAVUmWdJrGe2uaPXeR9aSG2sfBRm2Mbutb1v7gUl7OxID3iu5Tyto7X21e1R9OomEElNZXEJOEL9vxD7",
+        "X-HKVPN-Algorithm": "RS256",
+        "Authorization": "Bearer hkvpn_acc_9876543210abcdef9876543210abcdef"
+      }
+    },
+    {
+      "id": "neg_10_corrupted_signature",
+      "description": "Signature base64url bytes corrupted",
+      "type": "corrupted_signature",
+      "expectedError": "BAD_SIGNATURE",
+      "originalVectorId": "pos_01_ps256_with_token_json_body",
+      "tamperedInputs": {
+        "method": "POST",
+        "path": "/v1/profiles",
+        "timestamp": 1700000000,
+        "nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "accessToken": "hkvpn_acc_9876543210abcdef9876543210abcdef",
+        "rawBody": "{\"selectedNode\":\"node-de-01\",\"rulesVersion\":1,\"clientOperationId\":\"op-enroll-001\"}"
+      },
+      "presentedHeaders": {
+        "X-HKVPN-Device-Id": "9ecbb43ac6fbda663bd81db7f89b50b955692453fca013b50eb0e16a78f2e4fe",
+        "X-HKVPN-Timestamp": "1700000000",
+        "X-HKVPN-Nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "X-HKVPN-Signature": "SqaZFfIq5BNt4m4Lx71w54dVh1cntqIKTbgX0yvpSRfGt_BX7dYZG6PsA3GcILjt_h4fYCaM_xV4vofAfZ_weURrzsSZqbQnqemXGd-QEou6ocDnCGO9OOtarsiB1ihO0o9fmR5UwlRMttAtrxuGue4iG3RmocRfKjWFnjJDK0qdXz6Q9__rHdJktlfECYjKmj-sV6JcXcj9-6WMl6O2LDIIv1Ih-MbeXIOO50k6EICxBEMBaQS9TBxJOCW15a-1BjV5Oj-MzJVo9AkxgkDI6qt8AHCQz4OBNh2hFzF2nzQYxJ3YCo-GFUIV95IAgBLEMFxcH6z8_skKuOKy-4de1-aDln-J-_7hql82d21LispqH3aqzRXjANw83t6C5W54wM6s8bw_ZEVStz4xdKY8hn-uxKfRcJwSoHzGFZ00cMIUNrUIsAVUmWdJrGe2uaPXeR9aSG2sfBRm2Mbutb1v7gUl7OxID3iu5Tyto7X21e1R9OomEElNZXEJOEL9AAAA",
+        "X-HKVPN-Algorithm": "PS256",
+        "Authorization": "Bearer hkvpn_acc_9876543210abcdef9876543210abcdef"
+      }
+    },
+    {
+      "id": "neg_11_wrong_public_key",
+      "description": "Signature verified against another device's public key",
+      "type": "device_key_mismatch",
+      "expectedError": "DEVICE_KEY_MISMATCH",
+      "originalVectorId": "pos_01_ps256_with_token_json_body",
+      "tamperedInputs": {
+        "method": "POST",
+        "path": "/v1/profiles",
+        "timestamp": 1700000000,
+        "nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "accessToken": "hkvpn_acc_9876543210abcdef9876543210abcdef",
+        "rawBody": "{\"selectedNode\":\"node-de-01\",\"rulesVersion\":1,\"clientOperationId\":\"op-enroll-001\"}"
+      },
+      "presentedHeaders": {
+        "X-HKVPN-Device-Id": "56c3cc80349c6da2e3c53b52674a6b514800f58313248531b8723acca5df625d",
+        "X-HKVPN-Timestamp": "1700000000",
+        "X-HKVPN-Nonce": "MDEyMzQ1Njc4OWFiY2RlZg",
+        "X-HKVPN-Signature": "SqaZFfIq5BNt4m4Lx71w54dVh1cntqIKTbgX0yvpSRfGt_BX7dYZG6PsA3GcILjt_h4fYCaM_xV4vofAfZ_weURrzsSZqbQnqemXGd-QEou6ocDnCGO9OOtarsiB1ihO0o9fmR5UwlRMttAtrxuGue4iG3RmocRfKjWFnjJDK0qdXz6Q9__rHdJktlfECYjKmj-sV6JcXcj9-6WMl6O2LDIIv1Ih-MbeXIOO50k6EICxBEMBaQS9TBxJOCW15a-1BjV5Oj-MzJVo9AkxgkDI6qt8AHCQz4OBNh2hFzF2nzQYxJ3YCo-GFUIV95IAgBLEMFxcH6z8_skKuOKy-4de1-aDln-J-_7hql82d21LispqH3aqzRXjANw83t6C5W54wM6s8bw_ZEVStz4xdKY8hn-uxKfRcJwSoHzGFZ00cMIUNrUIsAVUmWdJrGe2uaPXeR9aSG2sfBRm2Mbutb1v7gUl7OxID3iu5Tyto7X21e1R9OomEElNZXEJOEL9vxD7",
+        "X-HKVPN-Algorithm": "PS256",
+        "Authorization": "Bearer hkvpn_acc_9876543210abcdef9876543210abcdef"
+      }
+    }
+  ]
+}

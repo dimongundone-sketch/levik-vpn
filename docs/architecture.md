@@ -27,3 +27,22 @@
 ## Нативное ядро libXray
 
 Файл `libXray.aar` является внешней бинарной зависимостью и исключен из Git. Скрипт `scripts/ci/fetch-libxray.sh` загружает официальный релизный архив `v26.7.28`, проверяет его SHA-256 хэш, извлекает AAR и повторно верифицирует его целостность перед сборкой.
+
+---
+
+## Hello Kitty VPN: Архитектурные сущности и контракты (Этап 01+)
+
+В рамках перехода к независимой архитектуре Hello Kitty VPN добавлены следующие сущности репозитория:
+
+### 1. Каталог контрактов (`contracts/`)
+- **`mobile-v1.openapi.yaml`**: Спецификация OpenAPI 3.1.0 публичного Mobile API `/v1` (`/devices/challenges`, `/devices/complete`, `/tokens/refresh`, `/servers`, `/profiles`, `/operations/{id}`, `/profiles/{id}`, `/credentials/{id}/renew`, `DELETE /devices/me`, `/routing-rules/manifest`).
+- **`profile-v2.schema.json`**: JSON Schema (Draft 2020-12) для зашифрованного конверта `TunnelProfileEnvelopeV2` (AES-256-GCM + RSA-OAEP + ECDSA P-256 подпись) и расшифрованного тела `TunnelProfilePayloadV2`.
+- **`routing-rules-v1.schema.json`**: JSON Schema (Draft 2020-12) для манифеста правил `RoutingRulesManifest` с защитными лимитами.
+- **`security-contract.md`**: Модель угроз (STRIDE), канонизация `RequestSigner v1`, Lost-Response Refresh Recovery протокол и матрица разделения ключей.
+- **`signing-vectors.json` & `envelope-vectors.json`**: Golden векторы подписи и шифрования конвертов.
+- **`node-xray-v2.openapi.yaml`**: Спецификация OpenAPI 3.1.0 частного API управления узлом Xray `/internal/v2/xray/*` с mTLS + HMAC аутентификацией.
+- **`contracts/probes/`**: Исполняемые верификационные тесты для проверки совместимости Kotlin/Go/Python (`crypto/` и `node/`).
+
+### 2. Слой данных и бэкенда (`backend/`)
+- **`backend/docs/data-model.md`**: Спецификация реляционной модели данных PostgreSQL 16+/17 на базе упорядоченных по времени первичных ключей UUIDv7 (17 таблиц, транзакционные границы enrollment/refresh, outbox pattern, retention и защита от коллизий IP в пуле WDTT).
+

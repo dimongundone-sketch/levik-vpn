@@ -10,8 +10,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "2.3.20" apply false
 }
 
-group = "com.leviknet"
-version = "2.7.13"
+group = "org.hellokittyvpn"
+version = "0.1.0"
 
 allprojects {
     group = rootProject.group

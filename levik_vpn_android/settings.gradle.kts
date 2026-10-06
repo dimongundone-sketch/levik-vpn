@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LevikVPN"
+rootProject.name = "HelloKittyVPN"
 include(":app")

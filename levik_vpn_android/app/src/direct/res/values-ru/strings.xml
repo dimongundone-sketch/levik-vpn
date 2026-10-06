@@ -12,17 +12,14 @@
     <string name="update_version_label">Версия %1$s</string>
     <string name="update_progress_label">Скачивание: %1$d%%</string>
     <string name="update_ready_desc">Обновление скачано и проверено. Нажмите «Установить» для применения.</string>
-    <string name="update_uptodate_desc">У вас установлена самая свежая версия Levik VPN.</string>
+    <string name="update_uptodate_desc">У вас установлена самая свежая версия Hello Kitty VPN.</string>
     <string name="renew_plan_btn">Продлить</string>
-    <string name="subscription_management_button">Подписка и оплата</string>
     <string name="relay_vk_auth_channel">Подключение через VK</string>
     <string name="relay_vk_auth_title">Требуется вход в VK</string>
     <string name="relay_vk_auth_notification">Откройте окно авторизации для подключения VPN</string>
     <string name="relay_vk_login_prompt">Войдите в VK. Данные аккаунта остаются внутри VK WebView.</string>
     <string name="relay_vk_joining">Получаем защищённый канал VK…</string>
-    <string name="subscription_buy_slots_btn">Докупить слоты</string>
-    <string name="subscription_buy_traffic_btn">Докупить трафик</string>
     <string name="notification_channel_updates">Обновления приложения</string>
-    <string name="notification_channel_updates_desc">Уведомления о новых версиях Levik VPN</string>
-    <string name="notification_update_available">Вышла новая версия Levik VPN %1$s. Нажмите, чтобы обновиться.</string>
+    <string name="notification_channel_updates_desc">Уведомления о новых версиях Hello Kitty VPN</string>
+    <string name="notification_update_available">Вышла новая версия Hello Kitty VPN %1$s. Нажмите, чтобы обновиться.</string>
 </resources>

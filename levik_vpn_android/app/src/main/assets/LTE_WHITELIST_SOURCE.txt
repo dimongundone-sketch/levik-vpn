@@ -1,4 +1,4 @@
-Levik VPN LTE routing data
+Upstream LTE routing data: source and attribution
 
 Source: https://github.com/hxehex/russia-mobile-internet-whitelist
 Pinned commit: fad3653ebd4b212643774a4d10af3eb33838e4ff
