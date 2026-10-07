@@ -1,0 +1,383 @@
+{
+  "version": "1.0",
+  "description": "Golden test vectors for Hello Kitty VPN HKVPN-CHALLENGE-V1 Server Time & Challenge Protocol",
+  "serverKey": {
+    "keyId": "hkvpn-challenge-signer-2026-v1",
+    "curve": "P-256",
+    "algorithm": "ES256",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3bsbO9xp17NT6qzzI2opw/DZzevf\nwtIjFOH2oVJnmPSa4GZ16faFRwydqbsYRRglKL/R6NflXpiYgj7XWqUEXw==\n-----END PUBLIC KEY-----\n",
+    "privateKeyPkcs8Pem": "-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgJU+OA5Qb+46GmBBz\nVhp3L6xNA4o0GilxkWNjj7TreoGhRANCAATduxs73GnXs1PqrPMjainD8NnN69/C\n0iMU4fahUmeY9JrgZnXp9oVHDJ2puxhFGCUov9Ho1+VemJiCPtdapQRf\n-----END PRIVATE KEY-----\n"
+  },
+  "rogueServerKey": {
+    "keyId": "hkvpn-challenge-signer-rogue-v1",
+    "curve": "P-256",
+    "algorithm": "ES256",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEPsGpKkADE50Y/cFm0VCDw5ZRD5kb\nTebPDJtq+VsUouMqJSNd301CicSLnA9M93d0DX6TSjBjnjLq7HITgRGEuw==\n-----END PUBLIC KEY-----\n",
+    "privateKeyPkcs8Pem": "-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgs/FrG5HXnPLu+YY1\nHt3ypPlRxKjkjEtH1fbffKf3QumhRANCAAQ+wakqQAMTnRj9wWbRUIPDllEPmRtN\n5s8Mm2r5WxSi4yolI13fTUKJxIucD0z3d3QNfpNKMGOeMurschOBEYS7\n-----END PRIVATE KEY-----\n"
+  },
+  "positiveVectors": [
+    {
+      "id": "pos_01_enroll_challenge",
+      "description": "Valid enrollment challenge response with verified P-256 low-S signature and bounded server time",
+      "requestBody": {
+        "mode": "enroll",
+        "invitationCode": "hkvpn-invite-7f9a2b8c4d1e",
+        "clientNonce": "dGhpczE2Qnl0ZXNOb25jZQ",
+        "spkiBase64Url": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE",
+        "capabilities": {
+          "requestSigningAlgorithm": "PS256",
+          "profileEncryptionAlgorithm": "RSA-OAEP-256+A256GCM"
+        }
+      },
+      "requestBodyRawBytes": "{\"mode\":\"enroll\",\"invitationCode\":\"hkvpn-invite-7f9a2b8c4d1e\",\"clientNonce\":\"dGhpczE2Qnl0ZXNOb25jZQ\",\"spkiBase64Url\":\"MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE\",\"capabilities\":{\"requestSigningAlgorithm\":\"PS256\",\"profileEncryptionAlgorithm\":\"RSA-OAEP-256+A256GCM\"}}",
+      "canonicalString": "HKVPN-CHALLENGE-V1\nchallenge\nES256\nhkvpn-challenge-signer-2026-v1\nc1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d\nc2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs\n2026-10-07T08:32:00Z\n2026-10-07T08:30:00Z\nd102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72\n",
+      "response": {
+        "challengeId": "c1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d",
+        "serverNonce": "c2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs",
+        "expiresAt": "2026-10-07T08:32:00Z",
+        "serverTime": "2026-10-07T08:30:00Z",
+        "keyId": "hkvpn-challenge-signer-2026-v1",
+        "purpose": "challenge",
+        "signatureAlgorithm": "ES256",
+        "requestBodyHash": "d102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72",
+        "signature": "MEQCIFRaz0x3cRSH2WYm_82jjQY1g88deQYeTQFp_-EvHJdBAiALGCrhgO9IuO3w10trhb1w5IoDwIPaaH2BKzoCPxFXWg"
+      }
+    },
+    {
+      "id": "pos_02_reauth_challenge",
+      "description": "Valid re-authentication challenge response without invitation token with verified P-256 signature",
+      "requestBody": {
+        "mode": "reauth",
+        "clientNonce": "YW5vdGhlcjE2Qnl0ZU5vbg",
+        "spkiBase64Url": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE",
+        "capabilities": {
+          "requestSigningAlgorithm": "PS256",
+          "profileEncryptionAlgorithm": "RSA-OAEP-256+A256GCM"
+        }
+      },
+      "requestBodyRawBytes": "{\"mode\":\"reauth\",\"clientNonce\":\"YW5vdGhlcjE2Qnl0ZU5vbg\",\"spkiBase64Url\":\"MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE\",\"capabilities\":{\"requestSigningAlgorithm\":\"PS256\",\"profileEncryptionAlgorithm\":\"RSA-OAEP-256+A256GCM\"}}",
+      "canonicalString": "HKVPN-CHALLENGE-V1\nchallenge\nES256\nhkvpn-challenge-signer-2026-v1\nd2b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d\nYW5vdGhlcjMyQnl0ZXNTZXJ2ZXJOb25jZUNTUFJORyE\n2026-10-07T08:35:00Z\n2026-10-07T08:33:00Z\ne87abb031f51e16660cd01893f26c27ca3b12e7aa8316cb36ac5f33eb5264979\n",
+      "response": {
+        "challengeId": "d2b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d",
+        "serverNonce": "YW5vdGhlcjMyQnl0ZXNTZXJ2ZXJOb25jZUNTUFJORyE",
+        "expiresAt": "2026-10-07T08:35:00Z",
+        "serverTime": "2026-10-07T08:33:00Z",
+        "keyId": "hkvpn-challenge-signer-2026-v1",
+        "purpose": "challenge",
+        "signatureAlgorithm": "ES256",
+        "requestBodyHash": "e87abb031f51e16660cd01893f26c27ca3b12e7aa8316cb36ac5f33eb5264979",
+        "signature": "MEUCIQDIVbT6O6gCYzQqM563pP1b51TutqnOxSmFu0n5ASFSyQIgYbo9JoStTSWERQyaAXp8rCB5PZmmHK7Ha2MAm5qgi34"
+      }
+    }
+  ],
+  "negativeVectors": [
+    {
+      "id": "neg_01_tampered_signature",
+      "description": "Server signature bytes corrupted on the wire",
+      "requestBody": {
+        "mode": "enroll",
+        "invitationCode": "hkvpn-invite-7f9a2b8c4d1e",
+        "clientNonce": "dGhpczE2Qnl0ZXNOb25jZQ",
+        "spkiBase64Url": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE",
+        "capabilities": {
+          "requestSigningAlgorithm": "PS256",
+          "profileEncryptionAlgorithm": "RSA-OAEP-256+A256GCM"
+        }
+      },
+      "requestBodyRawBytes": "{\"mode\":\"enroll\",\"invitationCode\":\"hkvpn-invite-7f9a2b8c4d1e\",\"clientNonce\":\"dGhpczE2Qnl0ZXNOb25jZQ\",\"spkiBase64Url\":\"MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE\",\"capabilities\":{\"requestSigningAlgorithm\":\"PS256\",\"profileEncryptionAlgorithm\":\"RSA-OAEP-256+A256GCM\"}}",
+      "canonicalString": "HKVPN-CHALLENGE-V1\nchallenge\nES256\nhkvpn-challenge-signer-2026-v1\nc1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d\nc2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs\n2026-10-07T08:32:00Z\n2026-10-07T08:30:00Z\nd102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72\n",
+      "response": {
+        "challengeId": "c1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d",
+        "serverNonce": "c2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs",
+        "expiresAt": "2026-10-07T08:32:00Z",
+        "serverTime": "2026-10-07T08:30:00Z",
+        "keyId": "hkvpn-challenge-signer-2026-v1",
+        "purpose": "challenge",
+        "signatureAlgorithm": "ES256",
+        "requestBodyHash": "d102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72",
+        "signature": "MEQCIFSlz0x3cRSH2WYm_82jjQY1g88deQYeTQFp_-EvHJdBAiALGCrhgO9IuO3w10trhb1w5IoDwIPaaH2BKzoCPxFXWg"
+      },
+      "expectedError": "CHALLENGE_SIGNATURE_INVALID"
+    },
+    {
+      "id": "neg_02_high_s_signature",
+      "description": "Server signature with high-S value rejected by strict canonical rule",
+      "requestBody": {
+        "mode": "enroll",
+        "invitationCode": "hkvpn-invite-7f9a2b8c4d1e",
+        "clientNonce": "dGhpczE2Qnl0ZXNOb25jZQ",
+        "spkiBase64Url": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE",
+        "capabilities": {
+          "requestSigningAlgorithm": "PS256",
+          "profileEncryptionAlgorithm": "RSA-OAEP-256+A256GCM"
+        }
+      },
+      "requestBodyRawBytes": "{\"mode\":\"enroll\",\"invitationCode\":\"hkvpn-invite-7f9a2b8c4d1e\",\"clientNonce\":\"dGhpczE2Qnl0ZXNOb25jZQ\",\"spkiBase64Url\":\"MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE\",\"capabilities\":{\"requestSigningAlgorithm\":\"PS256\",\"profileEncryptionAlgorithm\":\"RSA-OAEP-256+A256GCM\"}}",
+      "canonicalString": "HKVPN-CHALLENGE-V1\nchallenge\nES256\nhkvpn-challenge-signer-2026-v1\nc1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d\nc2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs\n2026-10-07T08:32:00Z\n2026-10-07T08:30:00Z\nd102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72\n",
+      "response": {
+        "challengeId": "c1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d",
+        "serverNonce": "c2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs",
+        "expiresAt": "2026-10-07T08:32:00Z",
+        "serverTime": "2026-10-07T08:30:00Z",
+        "keyId": "hkvpn-challenge-signer-2026-v1",
+        "purpose": "challenge",
+        "signatureAlgorithm": "ES256",
+        "requestBodyHash": "d102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72",
+        "signature": "MEYCIQCK1wV8IJqTNVPDo1iQRHrx6LH0078clqfSi1qDLqcMfgIhAMDo83JN11xwMfPtmOKFJ9tKWJ4O0kUw0caEjJsKt_nW"
+      },
+      "expectedError": "CHALLENGE_SIGNATURE_INVALID"
+    },
+    {
+      "id": "neg_03_tampered_request_body_hash",
+      "description": "Request body hash in response does not match SHA256 of sent request",
+      "requestBody": {
+        "mode": "enroll",
+        "invitationCode": "hkvpn-invite-7f9a2b8c4d1e",
+        "clientNonce": "dGhpczE2Qnl0ZXNOb25jZQ",
+        "spkiBase64Url": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE",
+        "capabilities": {
+          "requestSigningAlgorithm": "PS256",
+          "profileEncryptionAlgorithm": "RSA-OAEP-256+A256GCM"
+        }
+      },
+      "requestBodyRawBytes": "{\"mode\":\"enroll\",\"invitationCode\":\"hkvpn-invite-7f9a2b8c4d1e\",\"clientNonce\":\"dGhpczE2Qnl0ZXNOb25jZQ\",\"spkiBase64Url\":\"MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE\",\"capabilities\":{\"requestSigningAlgorithm\":\"PS256\",\"profileEncryptionAlgorithm\":\"RSA-OAEP-256+A256GCM\"}}",
+      "canonicalString": "HKVPN-CHALLENGE-V1\nchallenge\nES256\nhkvpn-challenge-signer-2026-v1\nc1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d\nc2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs\n2026-10-07T08:32:00Z\n2026-10-07T08:30:00Z\nd102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72\n",
+      "response": {
+        "challengeId": "c1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d",
+        "serverNonce": "c2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs",
+        "expiresAt": "2026-10-07T08:32:00Z",
+        "serverTime": "2026-10-07T08:30:00Z",
+        "keyId": "hkvpn-challenge-signer-2026-v1",
+        "purpose": "challenge",
+        "signatureAlgorithm": "ES256",
+        "requestBodyHash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "signature": "MEQCIFRaz0x3cRSH2WYm_82jjQY1g88deQYeTQFp_-EvHJdBAiALGCrhgO9IuO3w10trhb1w5IoDwIPaaH2BKzoCPxFXWg"
+      },
+      "expectedError": "REQUEST_BODY_HASH_MISMATCH"
+    },
+    {
+      "id": "neg_04_tampered_server_time",
+      "description": "serverTime altered after server signature generation",
+      "requestBody": {
+        "mode": "enroll",
+        "invitationCode": "hkvpn-invite-7f9a2b8c4d1e",
+        "clientNonce": "dGhpczE2Qnl0ZXNOb25jZQ",
+        "spkiBase64Url": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE",
+        "capabilities": {
+          "requestSigningAlgorithm": "PS256",
+          "profileEncryptionAlgorithm": "RSA-OAEP-256+A256GCM"
+        }
+      },
+      "requestBodyRawBytes": "{\"mode\":\"enroll\",\"invitationCode\":\"hkvpn-invite-7f9a2b8c4d1e\",\"clientNonce\":\"dGhpczE2Qnl0ZXNOb25jZQ\",\"spkiBase64Url\":\"MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE\",\"capabilities\":{\"requestSigningAlgorithm\":\"PS256\",\"profileEncryptionAlgorithm\":\"RSA-OAEP-256+A256GCM\"}}",
+      "canonicalString": "HKVPN-CHALLENGE-V1\nchallenge\nES256\nhkvpn-challenge-signer-2026-v1\nc1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d\nc2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs\n2026-10-07T08:32:00Z\n2026-10-07T08:30:00Z\nd102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72\n",
+      "response": {
+        "challengeId": "c1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d",
+        "serverNonce": "c2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs",
+        "expiresAt": "2026-10-07T08:32:00Z",
+        "serverTime": "2026-10-07T09:30:00Z",
+        "keyId": "hkvpn-challenge-signer-2026-v1",
+        "purpose": "challenge",
+        "signatureAlgorithm": "ES256",
+        "requestBodyHash": "d102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72",
+        "signature": "MEQCIFRaz0x3cRSH2WYm_82jjQY1g88deQYeTQFp_-EvHJdBAiALGCrhgO9IuO3w10trhb1w5IoDwIPaaH2BKzoCPxFXWg"
+      },
+      "expectedError": "CHALLENGE_SIGNATURE_INVALID"
+    },
+    {
+      "id": "neg_05_excessive_clock_drift",
+      "description": "Server time differs from client time by more than 86400 seconds (24h)",
+      "requestBody": {
+        "mode": "enroll",
+        "invitationCode": "hkvpn-invite-7f9a2b8c4d1e",
+        "clientNonce": "dGhpczE2Qnl0ZXNOb25jZQ",
+        "spkiBase64Url": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE",
+        "capabilities": {
+          "requestSigningAlgorithm": "PS256",
+          "profileEncryptionAlgorithm": "RSA-OAEP-256+A256GCM"
+        }
+      },
+      "requestBodyRawBytes": "{\"mode\":\"enroll\",\"invitationCode\":\"hkvpn-invite-7f9a2b8c4d1e\",\"clientNonce\":\"dGhpczE2Qnl0ZXNOb25jZQ\",\"spkiBase64Url\":\"MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE\",\"capabilities\":{\"requestSigningAlgorithm\":\"PS256\",\"profileEncryptionAlgorithm\":\"RSA-OAEP-256+A256GCM\"}}",
+      "canonicalString": "HKVPN-CHALLENGE-V1\nchallenge\nES256\nhkvpn-challenge-signer-2026-v1\nc1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d\nc2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs\n2026-10-08T12:02:00Z\n2026-10-08T12:00:00Z\nd102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72\n",
+      "response": {
+        "challengeId": "c1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d",
+        "serverNonce": "c2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs",
+        "expiresAt": "2026-10-08T12:02:00Z",
+        "serverTime": "2026-10-08T12:00:00Z",
+        "keyId": "hkvpn-challenge-signer-2026-v1",
+        "purpose": "challenge",
+        "signatureAlgorithm": "ES256",
+        "requestBodyHash": "d102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72",
+        "signature": "MEUCIQClR_UpOuS230PtCvHEQhlzPDZGATv88uNi2BLFqMBByAIgUWb7F0SzzoT9Q0UxDBr74YWLKozCqvNwSw3l1GZ410U"
+      },
+      "expectedError": "CLOCK_DRIFT_EXCESSIVE"
+    },
+    {
+      "id": "neg_06_expired_challenge",
+      "description": "Challenge response where expiresAt is in the past relative to serverTime",
+      "requestBody": {
+        "mode": "enroll",
+        "invitationCode": "hkvpn-invite-7f9a2b8c4d1e",
+        "clientNonce": "dGhpczE2Qnl0ZXNOb25jZQ",
+        "spkiBase64Url": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE",
+        "capabilities": {
+          "requestSigningAlgorithm": "PS256",
+          "profileEncryptionAlgorithm": "RSA-OAEP-256+A256GCM"
+        }
+      },
+      "requestBodyRawBytes": "{\"mode\":\"enroll\",\"invitationCode\":\"hkvpn-invite-7f9a2b8c4d1e\",\"clientNonce\":\"dGhpczE2Qnl0ZXNOb25jZQ\",\"spkiBase64Url\":\"MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE\",\"capabilities\":{\"requestSigningAlgorithm\":\"PS256\",\"profileEncryptionAlgorithm\":\"RSA-OAEP-256+A256GCM\"}}",
+      "canonicalString": "HKVPN-CHALLENGE-V1\nchallenge\nES256\nhkvpn-challenge-signer-2026-v1\nc1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d\nc2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs\n2026-10-07T08:29:00Z\n2026-10-07T08:30:00Z\nd102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72\n",
+      "response": {
+        "challengeId": "c1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d",
+        "serverNonce": "c2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs",
+        "expiresAt": "2026-10-07T08:29:00Z",
+        "serverTime": "2026-10-07T08:30:00Z",
+        "keyId": "hkvpn-challenge-signer-2026-v1",
+        "purpose": "challenge",
+        "signatureAlgorithm": "ES256",
+        "requestBodyHash": "d102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72",
+        "signature": "MEUCIQCTnoIRyj4NCYtYOCDkPza4_sW378cqpZ2-Fb1tpN0nLgIgVbMLXq_1d3o8SIuSMa624Vt-JsZvqHYKF9fBgWFH7uo"
+      },
+      "expectedError": "CHALLENGE_EXPIRED"
+    },
+    {
+      "id": "neg_07_untrusted_signing_key",
+      "description": "Challenge signed by unknown rogue EC key not in trusted challenge ring",
+      "requestBody": {
+        "mode": "enroll",
+        "invitationCode": "hkvpn-invite-7f9a2b8c4d1e",
+        "clientNonce": "dGhpczE2Qnl0ZXNOb25jZQ",
+        "spkiBase64Url": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE",
+        "capabilities": {
+          "requestSigningAlgorithm": "PS256",
+          "profileEncryptionAlgorithm": "RSA-OAEP-256+A256GCM"
+        }
+      },
+      "requestBodyRawBytes": "{\"mode\":\"enroll\",\"invitationCode\":\"hkvpn-invite-7f9a2b8c4d1e\",\"clientNonce\":\"dGhpczE2Qnl0ZXNOb25jZQ\",\"spkiBase64Url\":\"MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE\",\"capabilities\":{\"requestSigningAlgorithm\":\"PS256\",\"profileEncryptionAlgorithm\":\"RSA-OAEP-256+A256GCM\"}}",
+      "canonicalString": "HKVPN-CHALLENGE-V1\nchallenge\nES256\nhkvpn-challenge-signer-2026-v1\nc1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d\nc2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs\n2026-10-07T08:32:00Z\n2026-10-07T08:30:00Z\nd102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72\n",
+      "response": {
+        "challengeId": "c1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d",
+        "serverNonce": "c2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs",
+        "expiresAt": "2026-10-07T08:32:00Z",
+        "serverTime": "2026-10-07T08:30:00Z",
+        "keyId": "hkvpn-challenge-signer-rogue-v1",
+        "purpose": "challenge",
+        "signatureAlgorithm": "ES256",
+        "requestBodyHash": "d102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72",
+        "signature": "MEUCIQCMftGg0gvvfFBve9lc2JIUxd5pWA8mKlk8HZI0zLnntgIgJzNHLl_65HLSlv2vlu_7_53zjO2b3KoUE0saSjbOURo"
+      },
+      "expectedError": "UNAUTHORIZED_SIGNING_KEY"
+    },
+    {
+      "id": "neg_08_invalid_canonical_prefix",
+      "description": "Signature generated over incorrect canonical prefix (HKVPN-CHALLENGE-V2)",
+      "requestBody": {
+        "mode": "enroll",
+        "invitationCode": "hkvpn-invite-7f9a2b8c4d1e",
+        "clientNonce": "dGhpczE2Qnl0ZXNOb25jZQ",
+        "spkiBase64Url": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE",
+        "capabilities": {
+          "requestSigningAlgorithm": "PS256",
+          "profileEncryptionAlgorithm": "RSA-OAEP-256+A256GCM"
+        }
+      },
+      "requestBodyRawBytes": "{\"mode\":\"enroll\",\"invitationCode\":\"hkvpn-invite-7f9a2b8c4d1e\",\"clientNonce\":\"dGhpczE2Qnl0ZXNOb25jZQ\",\"spkiBase64Url\":\"MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE\",\"capabilities\":{\"requestSigningAlgorithm\":\"PS256\",\"profileEncryptionAlgorithm\":\"RSA-OAEP-256+A256GCM\"}}",
+      "canonicalString": "HKVPN-CHALLENGE-V2\nchallenge\nES256\nhkvpn-challenge-signer-2026-v1\nc1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d\nc2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs\n2026-10-07T08:32:00Z\n2026-10-07T08:30:00Z\nd102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72\n",
+      "response": {
+        "challengeId": "c1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d",
+        "serverNonce": "c2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs",
+        "expiresAt": "2026-10-07T08:32:00Z",
+        "serverTime": "2026-10-07T08:30:00Z",
+        "keyId": "hkvpn-challenge-signer-2026-v1",
+        "purpose": "challenge",
+        "signatureAlgorithm": "ES256",
+        "requestBodyHash": "d102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72",
+        "signature": "MEQCIGd9S7Alhi4_-tW2aP0Vmn0X4wsne2VguOe-1Ss5nvbuAiA2gM-tXpMIztpI7iwi3q6WEn9lwkEp4qLy1ZYC-yZ3nw"
+      },
+      "expectedError": "CHALLENGE_SIGNATURE_INVALID"
+    },
+    {
+      "id": "neg_09_invalid_client_nonce_length",
+      "description": "Client nonce is too short (less than 16 bytes / 22 characters)",
+      "requestBody": {
+        "mode": "enroll",
+        "invitationCode": "hkvpn-invite-7f9a2b8c4d1e",
+        "clientNonce": "dGhpczhCeXRl",
+        "spkiBase64Url": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE",
+        "capabilities": {
+          "requestSigningAlgorithm": "PS256",
+          "profileEncryptionAlgorithm": "RSA-OAEP-256+A256GCM"
+        }
+      },
+      "requestBodyRawBytes": "{\"mode\":\"enroll\",\"invitationCode\":\"hkvpn-invite-7f9a2b8c4d1e\",\"clientNonce\":\"dGhpczhCeXRl\",\"spkiBase64Url\":\"MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE\",\"capabilities\":{\"requestSigningAlgorithm\":\"PS256\",\"profileEncryptionAlgorithm\":\"RSA-OAEP-256+A256GCM\"}}",
+      "canonicalString": "HKVPN-CHALLENGE-V1\nchallenge\nES256\nhkvpn-challenge-signer-2026-v1\nc1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d\nc2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs\n2026-10-07T08:32:00Z\n2026-10-07T08:30:00Z\n8a781bfb2d1d9b6410673b70fc6b2814c1c00332763d6f434181e63e1d672cf4\n",
+      "response": {
+        "challengeId": "c1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d",
+        "serverNonce": "c2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs",
+        "expiresAt": "2026-10-07T08:32:00Z",
+        "serverTime": "2026-10-07T08:30:00Z",
+        "keyId": "hkvpn-challenge-signer-2026-v1",
+        "purpose": "challenge",
+        "signatureAlgorithm": "ES256",
+        "requestBodyHash": "8a781bfb2d1d9b6410673b70fc6b2814c1c00332763d6f434181e63e1d672cf4",
+        "signature": "MEUCIQCTeflJnoQjiG7cPSt4zbmtQyfluIaAjxDPOGmH2w5XVQIgKdt11aZdv_RqXNAFSBtURcPwePXq_3IUjx3XwH2QEzA"
+      },
+      "expectedError": "INVALID_NONCE_LENGTH"
+    },
+    {
+      "id": "neg_10_missing_signature",
+      "description": "Signature field is empty or missing from challenge response",
+      "requestBody": {
+        "mode": "enroll",
+        "invitationCode": "hkvpn-invite-7f9a2b8c4d1e",
+        "clientNonce": "dGhpczE2Qnl0ZXNOb25jZQ",
+        "spkiBase64Url": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE",
+        "capabilities": {
+          "requestSigningAlgorithm": "PS256",
+          "profileEncryptionAlgorithm": "RSA-OAEP-256+A256GCM"
+        }
+      },
+      "requestBodyRawBytes": "{\"mode\":\"enroll\",\"invitationCode\":\"hkvpn-invite-7f9a2b8c4d1e\",\"clientNonce\":\"dGhpczE2Qnl0ZXNOb25jZQ\",\"spkiBase64Url\":\"MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE\",\"capabilities\":{\"requestSigningAlgorithm\":\"PS256\",\"profileEncryptionAlgorithm\":\"RSA-OAEP-256+A256GCM\"}}",
+      "canonicalString": "HKVPN-CHALLENGE-V1\nchallenge\nES256\nhkvpn-challenge-signer-2026-v1\nc1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d\nc2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs\n2026-10-07T08:32:00Z\n2026-10-07T08:30:00Z\nd102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72\n",
+      "response": {
+        "challengeId": "c1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d",
+        "serverNonce": "c2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs",
+        "expiresAt": "2026-10-07T08:32:00Z",
+        "serverTime": "2026-10-07T08:30:00Z",
+        "keyId": "hkvpn-challenge-signer-2026-v1",
+        "purpose": "challenge",
+        "signatureAlgorithm": "ES256",
+        "requestBodyHash": "d102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72",
+        "signature": ""
+      },
+      "expectedError": "MISSING_SIGNATURE"
+    },
+    {
+      "id": "neg_11_invalid_purpose",
+      "description": "Purpose field is not 'challenge'",
+      "requestBody": {
+        "mode": "enroll",
+        "invitationCode": "hkvpn-invite-7f9a2b8c4d1e",
+        "clientNonce": "dGhpczE2Qnl0ZXNOb25jZQ",
+        "spkiBase64Url": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE",
+        "capabilities": {
+          "requestSigningAlgorithm": "PS256",
+          "profileEncryptionAlgorithm": "RSA-OAEP-256+A256GCM"
+        }
+      },
+      "requestBodyRawBytes": "{\"mode\":\"enroll\",\"invitationCode\":\"hkvpn-invite-7f9a2b8c4d1e\",\"clientNonce\":\"dGhpczE2Qnl0ZXNOb25jZQ\",\"spkiBase64Url\":\"MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxmQp-CMT_6j9DniZOwdeTP05dut7EBd19JmjN9lY3hmpbO3L9_2Wj7egpVQXre-yqpk8Zl9dRIy26dMBnmTWLkN18le5dPLiJmQTKZLKA4wUhR4ifVuJmiIrQVuZ8F7PSvDjODhIFi_Lt7T4SfP9SGM914M42axQYp_-K9d_tybg7u_F1LV_EgkTL9NpklIM2pc6mAncnCb7W0f8p76L-q_O7MwoCxoDiX6nAuqgIbOW8I66Y_lHigz5LxsdK1a4IKUq_mqc5kFeiWZIpRavCp10su73CkcPtHRkfWBp8R48rhDGcsnPX37QXElESV8NZaM7NTP9zzVABnNw4jgectqz42Q26IHXZnNJY4wwaM4OEmNnfAeeaBxza4FTTSgbcJqIrNfTcuJHMD0_m__w85R9oBnaUb9wytMK0d-bwulUWhmcOSYgqhTmWFAejGRnZQi-kgGB244GWwLenEyfDrCsayiu_GKjjP0OzOG4gxXDj9UCzTTkfl0Ov_PY5IKVAgMBAAE\",\"capabilities\":{\"requestSigningAlgorithm\":\"PS256\",\"profileEncryptionAlgorithm\":\"RSA-OAEP-256+A256GCM\"}}",
+      "canonicalString": "HKVPN-CHALLENGE-V1\nprofile\nES256\nhkvpn-challenge-signer-2026-v1\nc1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d\nc2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs\n2026-10-07T08:32:00Z\n2026-10-07T08:30:00Z\nd102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72\n",
+      "response": {
+        "challengeId": "c1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d",
+        "serverNonce": "c2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs",
+        "expiresAt": "2026-10-07T08:32:00Z",
+        "serverTime": "2026-10-07T08:30:00Z",
+        "keyId": "hkvpn-challenge-signer-2026-v1",
+        "purpose": "profile",
+        "signatureAlgorithm": "ES256",
+        "requestBodyHash": "d102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72",
+        "signature": "MEUCIQC7kGYvVHm_5E0EGOymDcQ6oYRH3t1ic3xOvlBsm-TIVAIgSZcHYcrepY1RsfOsVO30QtJZ8jsIBgLfRnk-f7MGen0"
+      },
+      "expectedError": "INVALID_PURPOSE"
+    }
+  ]
+}

@@ -176,7 +176,7 @@ class AuthControlPlaneState:
                             return 401, {"code": "CACHE_UNAVAILABLE"}
                     else:
                         # Outside 120s window: not a reuse attack, but recovery has expired
-                        return 401, {
+                        return 410, {
                             "code": "REFRESH_RETRY_EXPIRED",
                             "message": "Retry window exceeded; trigger device reauth"
                         }
@@ -237,25 +237,114 @@ class AuthControlPlaneState:
 
             return 200, response_payload
 
-    def handle_reauth(self, device_id: str) -> tuple[int, dict]:
-        """Device performs Keystore-backed re-authentication after expired retry."""
+    def handle_reauth(
+        self,
+        device_id: str,
+        client_operation_id: Optional[str] = None,
+        raw_body: Optional[bytes] = None,
+        simulated_now: Optional[float] = None
+    ) -> tuple[int, dict]:
+        """Device performs Keystore-backed re-authentication after expired retry.
+        Preserves existing grant ID and original expiry. Strictly rejects revoked/expired grants.
+        """
+        now = simulated_now if simulated_now is not None else time.time()
         with self._lock:
             dev = self.devices.get(device_id)
             if not dev or dev["status"] != "ACTIVE":
                 return 401, {"code": "DEVICE_NOT_FOUND"}
 
-            # Revoke existing families for this device
+            grant_id = dev.get("grant_id")
+            grant = self.grants.get(grant_id) if grant_id else None
+            if not grant or grant.status != "ACTIVE":
+                return 401, {"code": "GRANT_INACTIVE", "message": "Grant is revoked or missing"}
+            if grant.expires_at <= now:
+                return 401, {"code": "GRANT_EXPIRED", "message": "Grant has expired"}
+
+            # Check idempotency / recovery cache if client_operation_id provided
+            if client_operation_id:
+                body_hash = sha256_hex(raw_body) if raw_body is not None else ""
+                idemp_key = f"{device_id}:{client_operation_id}"
+                if idemp_key in self.idempotency_store:
+                    prev_body_hash = self.idempotency_store[idemp_key]["body_hash"]
+                    if prev_body_hash != body_hash:
+                        return 409, {"code": "IDEMPOTENCY_CONFLICT", "message": "Payload modified for existing operation ID"}
+                    cache_key = f"resp:{device_id}:{client_operation_id}"
+                    cached = self.cached_responses.get(cache_key)
+                    if cached:
+                        if now <= cached.expires_at:
+                            return 200, {
+                                **cached.encrypted_payload,
+                                "_recoveredFromCache": True
+                            }
+                        return 410, {"code": "REFRESH_RETRY_EXPIRED", "message": "Recovery window expired"}
+
+            # Retain SAME grant ID and original expiry
+            orig_expiry = grant.expires_at
+
+            # In one atomic transaction boundary: revoke existing families and tokens for this device
             for fam in self.token_families.values():
                 if fam["device_id"] == device_id:
                     fam["is_revoked"] = True
 
-        # Issue new active family
-        new_acc, new_ref = self.enroll_device(device_id)
-        return 200, {
-            "accessToken": new_acc,
-            "refreshToken": new_ref,
-            "reauthSuccess": True
-        }
+            for at in self.access_tokens.values():
+                if at["device_id"] == device_id:
+                    at["is_revoked"] = True
+
+            for rt in self.refresh_tokens.values():
+                if rt.device_id == device_id:
+                    rt.is_revoked = True
+
+            # Create ONE new token family bound to SAME grant
+            new_fam_id = f"fam_{uuid.uuid4().hex[:16]}"
+            fam_expires_at = min(now + 30 * 86400, orig_expiry)
+            self.token_families[new_fam_id] = {
+                "device_id": device_id,
+                "is_revoked": False,
+                "grant_id": grant_id,
+                "expires_at": fam_expires_at
+            }
+
+            new_acc = generate_token()
+            new_ref = generate_token()
+            new_acc_hash = sha256_hex(new_acc.encode('utf-8'))
+            new_ref_hash = sha256_hex(new_ref.encode('utf-8'))
+
+            self.access_tokens[new_acc_hash] = {
+                "family_id": new_fam_id,
+                "device_id": device_id,
+                "is_revoked": False
+            }
+            op_id = client_operation_id or "reauth_init"
+            b_hash = sha256_hex(raw_body) if raw_body is not None else "reauth_body"
+            self.refresh_tokens[new_ref_hash] = TokenRecord(
+                token_hash=new_ref_hash,
+                family_id=new_fam_id,
+                device_id=device_id,
+                issuance_op_id=op_id,
+                issuance_body_hash=b_hash
+            )
+
+            response_payload = {
+                "accessToken": new_acc,
+                "refreshToken": new_ref,
+                "grantId": grant_id,
+                "grantExpiresAt": orig_expiry,
+                "reauthSuccess": True,
+                "expiresIn": 900
+            }
+
+            if client_operation_id:
+                cache_key = f"resp:{device_id}:{client_operation_id}"
+                self.cached_responses[cache_key] = CachedResponse(
+                    encrypted_payload=response_payload,
+                    expires_at=now + 120.0
+                )
+                self.idempotency_store[f"{device_id}:{client_operation_id}"] = {
+                    "body_hash": b_hash,
+                    "committed_at": now
+                }
+
+            return 200, response_payload
 
     def handle_delete_device(self, device_id: str, idempotency_key_header: Optional[str]) -> tuple[int, dict]:
         """DELETE /v1/devices/me: bodyless, no Idempotency-Key allowed, naturally idempotent."""
@@ -428,18 +517,19 @@ def run_state_probe():
         raw_body=body_exp,
         simulated_now=t1 + 125.0
     )
-    assert s_late == 401, f"Expected 401, got {s_late}"
+    assert s_late == 410, f"Expected 410, got {s_late}"
     assert r_late["code"] == "REFRESH_RETRY_EXPIRED"
     # Family is NOT revoked
     dev2_fam = state.refresh_tokens[sha256_hex(ref3.encode('utf-8'))].family_id
     assert state.token_families[dev2_fam]["is_revoked"] is False, "Family must NOT be revoked on expiration"
-    print(f"  [PASS] Retry after 125s returned REFRESH_RETRY_EXPIRED without false reuse detection")
+    print(f"  [PASS] Retry after 125s returned 410 REFRESH_RETRY_EXPIRED without false reuse detection")
 
     # Keystore Reauth flow recovery
-    s_reauth, r_reauth = state.handle_reauth("test_dev_expired_recovery_002")
+    s_reauth, r_reauth = state.handle_reauth("test_dev_expired_recovery_002", simulated_now=t1 + 130.0)
     assert s_reauth == 200
     assert r_reauth["reauthSuccess"] is True
-    print(f"  [PASS] Keystore reauth recovered active session cleanly")
+    assert r_reauth["grantId"] == state.devices["test_dev_expired_recovery_002"]["grant_id"]
+    print(f"  [PASS] Keystore reauth recovered active session cleanly while preserving grant ID")
 
     # Step 9: Grant Expiration & Revocation Validation
     t_grant = 1700002000.0
@@ -524,6 +614,117 @@ def run_state_probe():
     s_del2, _ = state.handle_delete_device(del_dev, idempotency_key_header=None)
     assert s_del2 == 410
     print(f"  [PASS] DELETE /v1/devices/me verified naturally idempotent")
+
+    # Step 12: Comprehensive F01 Reauth Regressions
+    print("[*] Running F01 Reauth Security Regressions...")
+    t_reauth_base = 1700010000.0
+
+    # 12.1 Active device + Revoked grant -> MUST REJECT, no new family/tokens/grant
+    dev_rev_grant = "test_dev_f01_revoked_grant"
+    state.enroll_device(dev_rev_grant, grant_duration=3600.0, simulated_now=t_reauth_base)
+    g_id = state.devices[dev_rev_grant]["grant_id"]
+    state.grants[g_id].status = "REVOKED" # administratively revoked
+    s_rev_g, r_rev_g = state.handle_reauth(dev_rev_grant, simulated_now=t_reauth_base + 10.0)
+    assert s_rev_g == 401 and r_rev_g["code"] == "GRANT_INACTIVE", f"Expected 401 GRANT_INACTIVE, got {s_rev_g} {r_rev_g}"
+    print(f"  [PASS] Reauth strictly rejected on revoked grant (no resurrection)")
+
+    # 12.2 Active device + Expired grant -> MUST REJECT
+    dev_exp_grant = "test_dev_f01_expired_grant"
+    state.enroll_device(dev_exp_grant, grant_duration=60.0, simulated_now=t_reauth_base)
+    s_exp_g, r_exp_g = state.handle_reauth(dev_exp_grant, simulated_now=t_reauth_base + 65.0)
+    assert s_exp_g == 401 and r_exp_g["code"] == "GRANT_EXPIRED", f"Expected 401 GRANT_EXPIRED, got {s_exp_g} {r_exp_g}"
+    print(f"  [PASS] Reauth strictly rejected on expired grant")
+
+    # 12.3 Missing grant -> MUST REJECT
+    dev_missing_g = "test_dev_f01_missing_grant"
+    state.enroll_device(dev_missing_g, grant_duration=3600.0, simulated_now=t_reauth_base)
+    state.devices[dev_missing_g]["grant_id"] = "grant_nonexistent_xyz"
+    s_mis_g, r_mis_g = state.handle_reauth(dev_missing_g, simulated_now=t_reauth_base + 10.0)
+    assert s_mis_g == 401 and r_mis_g["code"] == "GRANT_INACTIVE"
+    print(f"  [PASS] Reauth strictly rejected on missing grant")
+
+    # 12.4 Valid short grant without extension -> preserves identical grant ID and expiry!
+    dev_short_g = "test_dev_f01_short_grant"
+    acc_s0, ref_s0 = state.enroll_device(dev_short_g, grant_duration=500.0, simulated_now=t_reauth_base)
+    orig_grant_id = state.devices[dev_short_g]["grant_id"]
+    orig_grant_expiry = state.grants[orig_grant_id].expires_at
+    ref_s0_hash = sha256_hex(ref_s0.encode('utf-8'))
+    old_fam_id = state.refresh_tokens[ref_s0_hash].family_id
+
+    s_reauth_valid, r_reauth_valid = state.handle_reauth(
+        dev_short_g,
+        client_operation_id="op-reauth-short-1",
+        raw_body=b'{"clientOperationId":"op-reauth-short-1"}',
+        simulated_now=t_reauth_base + 100.0
+    )
+    assert s_reauth_valid == 200
+    assert r_reauth_valid["grantId"] == orig_grant_id, "Grant ID MUST remain strictly identical"
+    assert r_reauth_valid["grantExpiresAt"] == orig_grant_expiry, "Grant expiry MUST NOT be extended"
+    assert state.grants[orig_grant_id].expires_at == orig_grant_expiry, "Stored grant expiry unchanged"
+    assert state.token_families[old_fam_id]["is_revoked"] is True, "Old token family must be revoked"
+
+    # Old tokens stay revoked
+    s_old_refresh, r_old_refresh = state.handle_refresh(
+        dev_short_g,
+        idempotency_key="op-try-old",
+        refresh_token=ref_s0,
+        client_operation_id="op-try-old",
+        raw_body=b'{"refreshToken":"old"}',
+        simulated_now=t_reauth_base + 110.0
+    )
+    assert s_old_refresh == 401 and r_old_refresh["code"] == "FAMILY_REVOKED"
+    print(f"  [PASS] Valid short grant preserved without extension, old tokens remain revoked")
+
+    # 12.5 Lost-response retry of reauth within 120s returns cached response
+    s_reauth_retry, r_reauth_retry = state.handle_reauth(
+        dev_short_g,
+        client_operation_id="op-reauth-short-1",
+        raw_body=b'{"clientOperationId":"op-reauth-short-1"}',
+        simulated_now=t_reauth_base + 130.0
+    )
+    assert s_reauth_retry == 200
+    assert r_reauth_retry.get("_recoveredFromCache") is True
+    assert r_reauth_retry["refreshToken"] == r_reauth_valid["refreshToken"]
+    print(f"  [PASS] Reauth exact retry within 120s returns cached response without secondary rotation")
+
+    # 12.6 Reauth idempotency conflict (altered payload)
+    s_reauth_conf, r_reauth_conf = state.handle_reauth(
+        dev_short_g,
+        client_operation_id="op-reauth-short-1",
+        raw_body=b'{"clientOperationId":"op-reauth-short-1","tampered":true}',
+        simulated_now=t_reauth_base + 140.0
+    )
+    assert s_reauth_conf == 409 and r_reauth_conf["code"] == "IDEMPOTENCY_CONFLICT"
+    print(f"  [PASS] Reauth altered body conflict returned 409")
+
+    # 12.7 Same-second successive reauths create distinct families cleanly
+    s_reauth_s1, r_reauth_s1 = state.handle_reauth(dev_short_g, simulated_now=t_reauth_base + 200.0)
+    s_reauth_s2, r_reauth_s2 = state.handle_reauth(dev_short_g, simulated_now=t_reauth_base + 200.0)
+    assert s_reauth_s1 == 200 and s_reauth_s2 == 200
+    ref_s1_hash = sha256_hex(r_reauth_s1["refreshToken"].encode('utf-8'))
+    ref_s2_hash = sha256_hex(r_reauth_s2["refreshToken"].encode('utf-8'))
+    fam_s1 = state.refresh_tokens[ref_s1_hash].family_id
+    fam_s2 = state.refresh_tokens[ref_s2_hash].family_id
+    assert fam_s1 != fam_s2, "Successive reauths must yield distinct families"
+    assert state.token_families[fam_s1]["is_revoked"] is True, "Predecessor family revoked"
+    assert state.token_families[fam_s2]["is_revoked"] is False, "Latest family active"
+    print(f"  [PASS] Same-second reauths cleanly rotate families atomically")
+
+    # 12.8 Device ID prefix isolation
+    dev_prefix = "test_dev_prefix"
+    dev_prefix_long = "test_dev_prefix_longer"
+    state.enroll_device(dev_prefix, grant_duration=3600.0, simulated_now=t_reauth_base)
+    state.enroll_device(dev_prefix_long, grant_duration=3600.0, simulated_now=t_reauth_base)
+    s_p_reauth, _ = state.handle_reauth(dev_prefix, simulated_now=t_reauth_base + 10.0)
+    assert s_p_reauth == 200
+    long_fam = state.devices[dev_prefix_long]["grant_id"]
+    assert state.grants[long_fam].status == "ACTIVE"
+    print(f"  [PASS] Device ID prefix collisions safely isolated without side effects")
+
+    # 12.9 Reauth after terminal DELETE / revoke -> strictly rejected
+    s_reauth_after_del, r_reauth_after_del = state.handle_reauth(del_dev, simulated_now=t_reauth_base + 300.0)
+    assert s_reauth_after_del == 401, f"Expected 401 after delete, got {s_reauth_after_del}"
+    print(f"  [PASS] Reauth rejected after terminal DELETE (no resurrection)")
 
     print(f"\n==========================================")
     print(f" REFRESH STATE PROBE: 100% PASS")

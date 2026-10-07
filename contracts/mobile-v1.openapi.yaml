@@ -36,6 +36,7 @@ paths:
                 value:
                   mode: enroll
                   invitationCode: hkvpn-invite-7f9a2b8c4d1e
+                  clientNonce: dGhpczE2Qnl0ZXNOb25jZQ
                   spkiBase64Url: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz7ZkXw0d7v8L9k2M8x3pQ1Z7r4w5y6u7i8o9p0a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6IDAQAB
                   capabilities:
                     requestSigningAlgorithm: PS256
@@ -44,6 +45,7 @@ paths:
                 summary: Device re-authentication challenge
                 value:
                   mode: reauth
+                  clientNonce: dGhpczE2Qnl0ZXNOb25jZQ
                   spkiBase64Url: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz7ZkXw0d7v8L9k2M8x3pQ1Z7r4w5y6u7i8o9p0a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6IDAQAB
                   capabilities:
                     requestSigningAlgorithm: PS256
@@ -58,11 +60,15 @@ paths:
               examples:
                 success:
                   value:
-                    challengeId: a1b2c3d4-e5f6-4a1b-8c2d-3e4f5a6b7c8d
-                    nonce: 47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU
-                    expiresAt: '2026-10-06T21:30:00Z'
-                    serverTime: '2026-10-06T21:28:00Z'
-                    keyId: srv-key-2026-10-a
+                    challengeId: c1a2b3c4-d5e6-7a8b-9c0d-1e2f3a4b5c6d
+                    serverNonce: c2VydmVyMzJCeXRlc05vbmNlQ1NQUk5HQnl0ZXNPYWs
+                    expiresAt: '2026-10-07T08:32:00Z'
+                    serverTime: '2026-10-07T08:30:00Z'
+                    keyId: hkvpn-challenge-signer-2026-v1
+                    purpose: challenge
+                    signatureAlgorithm: ES256
+                    requestBodyHash: d102dad41ef662af3addaeb2d18a170de4bce1766e489a12d5dab316fc26ff72
+                    signature: MEUCIQDvT9Qg-QZEAyQhQUp-zAT0ilsf7PQaflPg7rrh40AqIQIgWqVGuJNrKmPlVOsTJp-CTz-cgn-U9Y9yhj99tRVWj5Y
         '400':
           description: Malformed request, unsupported algorithm, or missing invitationCode for enroll
           content:
@@ -229,6 +235,14 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                retryExpired:
+                  value:
+                    type: https://api.hellokittyvpn.org/errors/refresh-retry-expired
+                    title: Refresh Retry Expired
+                    status: 410
+                    detail: The 120-second lost-response recovery window has expired. Re-authenticate via /v1/devices/challenges.
+                    code: REFRESH_RETRY_EXPIRED
 
   /v1/servers:
     get:
@@ -451,11 +465,11 @@ paths:
               examples:
                 envelope:
                   value:
-                    protected: eyJwdXJwb3NlIjoicHJvZmlsZSIsInNjaGVtYVZlcnNpb24iOjJ9
-                    wrappedKey: d3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVzd3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVzd3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVzd3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVzd3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVzd3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVzd3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVzd3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVzd3JhcHBlZEtleUJ5dGVzQmFzZTY0VXJsRW5jb2RlZDUxMkJ5dGVz
-                    iv: dGhpc0lzQVJhbmRv
-                    ciphertext: Y2lwaGVydGV4dEJ5dGVzUGx1czE2Qnl0ZXNUYWc
-                    signature: MEUCIQDx3z9_example_signature_base64url_string_that_is_at_least_80_chars_long_and_valid_der_AiEA8y_test
+                    protected: eyJwdXJwb3NlIjoicHJvZmlsZSIsInNjaGVtYVZlcnNpb24iOjIsImtleUlkIjoiaGt2cG4tcHJvZmlsZS1zaWduZXItMjAyNi12MSIsInNpZ25hdHVyZUFsZ29yaXRobSI6IkVTMjU2IiwiZW5jQWxnb3JpdGhtIjoiUlNBLU9BRVAtMjU2K0EyNTZHQ00iLCJkZXZpY2VJZCI6IjllY2JiNDNhYzZmYmRhNjYzYmQ4MWRiN2Y4OWI1MGI5NTU2OTI0NTNmY2EwMTNiNTBlYjBlMTZhNzhmMmU0ZmUiLCJhY2Nlc3NJZCI6ImEwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSIsInByb2ZpbGVJZCI6ImIwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMiIsInByb2ZpbGVSZXZpc2lvbiI6MiwiaXNzdWVkQXQiOiIyMDI2LTEwLTA2VDIxOjAwOjAwWiIsImNyZWRlbnRpYWxFeHBpcmVzQXQiOiIyMDI2LTEwLTA3VDIxOjAwOjAwWiJ9
+                    wrappedKey: SiO4Jt35bx3v1EtV24-Ys2KynqszLYhvQqLMQ_XJtapJiOKcnM-A0UUOLKl7Rq0C6L3c1ofJ8QcidUtixP8YpEu00EJqHyHrB_pemDE4B3HzCIIi9d6-rtmSix2kA33VybO7c_QvXHlBndsqQ8ZF6pDOp60QzSvUtTkwQOgj-qhJacLQLSvDwc6oGf96uh_fXkmmaTjI29uSNS_gFjK2QBXdAiIhkuzYfs_0r78Rla8JWcrdTZlpbj4Qxx6mZYhO3qRKXd_yDa7EMYZlo0HVtM9luMup5AF46YFjwGiTpjDib4zvikQejpp7Uf9anpk4LX6f1I80LJRVZCOWLeqiHg87x6Wxel-RHBjUxM99JeNAMQSv9UEIkFF5IG8pwabQR24_l1cLqtGZjkMSLzu7Jk7bignf9rI330_OkCERwVDuvBhi0Z6v2oTFlx5U8EChgZZcfFwvYZK-3rJHBj2Sr-RrBD3CZUdCwf91SaYO4g0AGmdBpeidnM5kfE1nfc31
+                    iv: to6xEE9PrNX-ZY4v
+                    ciphertext: 4mwtyTZbzxZEdGY_aI3IyaaxsuRsDb52Vu3vZbDOM6x-WwUGUuAFfxUNILg31Fkg365tj2ALVl2jnj5q_Q4Cn76BHgG0se3ay2h-sBV2n5wxc7L7FpcDUiNdMmVZFcitb9wxpZjfvMHiZpbUV_DerO9G3pcyxzGxj-tevrM490ALK9tIsBC7eoN941eGt1LV16GHX1FcF9PzS5I5n63XLVeXlKXhap_17iyBtvlxP5z-U7QfpR4AL8vJZ427GZqOW32M-8m66yZ1s8hjq3R1bwE-JVFNFTyJ7JLX5SDKkJGpM4Bo8w9YpXW0y0eLGnxFytEMx48aNYokLnAOqxMP_fLPnUcs9rF18MJQmgcYQR_hn_i2LP4exhbZ3CWmhPYYBEGzutTyZ2au3sfvtV_T0al92UmEt13WniP3hFbvysVWTkGLvscNu_sztO1iOxltG-MUJlOo5HEcrD0ZKiNVRdscPNhfmTm20PtIJSBTytl4OpQ5nRGh4lmOlJp4mYamnnUXmXY0dHCRon6o7odzmwGNT9CHUCKjqbeljENotPWNmjnzeQ3eNB2_M8YzQPVY9iITS4dQ9v6-26WM0QX5egv0wwHyRTzEo6u__6DexbLsEPBTAdlfaYGGJDjUITu7jYRNOdymdGhlvdsGMM7QcLZqw_cZnIDs09H3ia42D2267V2Mbpmj9JN8qcR7O18-DbUqNnbu9Qjgnf0Lwa36hDtOuhh9Eo37J2whboXx0BcV_9Pri0ByJKTl5Oy2UqA0gnZYPdKx4Ldiv8ilW0hn1UXmz7r8xjabEjBWdWvh7XGz-ZdY5FZxU7wB1AfYgFyNvV3JHiC6WxVUSQRCF1IviAx1GjkY8ebSMwrM32Tibz9PLt1X2J2z856CQ6rvPFPa0l9tc72DRVMhODSWgqLsCr0uYQG-2ymysy6Ovw369xMZof8UtCXGb-ZIVdVHJVvUYq0bYQiSw63LL-wRehh3mHMICC3Es_Kk5KGI-neh9Gbf0vYO_ZibHjSSRnlh3clvAFcqY_cdYVf2Gi24iWzfCrcGWi86MY4YN3SLp18XiojggeL1rAhci8c3Kr3xTLmRfRZlq4KmNf6guu9V8yq7_7ZRAg3XqDt9VwZXiHRMtUdBqA-UudA3yYdrl3SNbdDRSbkdD_GQSO3C-XcUA3Jbksnmt4xfHvXZBbBju3hvCjuH0nYFng2lG1jbd6VxL7hXLJ2CXi4si8nPZmLLqxI6xZg0NbJqVZIQlDuH3Mxeh2qz
+                    signature: MEUCIQC_QlU5K3NOOXv5-CSqUfOMmeF9WdjnuindCx4o8ZirAgIgNWQpNksHFoi_Td-I6lrSvE__kyviv4xMSnh5TDAjm5A
         '401':
           description: Unauthorized
           content:
@@ -782,6 +796,7 @@ components:
       additionalProperties: false
       required:
         - mode
+        - clientNonce
         - spkiBase64Url
         - capabilities
       properties:
@@ -791,6 +806,12 @@ components:
             - enroll
             - reauth
           description: Enrollment for new devices or re-authentication for known devices.
+        clientNonce:
+          type: string
+          minLength: 22
+          maxLength: 22
+          pattern: '^[A-Za-z0-9_-]{22}$'
+          description: 16 cryptographically random CSPRNG bytes, base64url unpadded.
         invitationCode:
           type: string
           minLength: 8
@@ -811,15 +832,19 @@ components:
       additionalProperties: false
       required:
         - challengeId
-        - nonce
+        - serverNonce
         - expiresAt
         - serverTime
         - keyId
+        - purpose
+        - signatureAlgorithm
+        - requestBodyHash
+        - signature
       properties:
         challengeId:
           type: string
           format: uuid
-        nonce:
+        serverNonce:
           type: string
           pattern: '^[A-Za-z0-9_-]{43}$'
           description: 32 random CSPRNG bytes base64url unpadded.
@@ -835,6 +860,24 @@ components:
           type: string
           minLength: 1
           maxLength: 64
+        purpose:
+          type: string
+          enum:
+            - challenge
+          description: Protocol purpose discriminator.
+        signatureAlgorithm:
+          type: string
+          enum:
+            - ES256
+          description: Signature algorithm used by server challenge signer.
+        requestBodyHash:
+          type: string
+          pattern: '^[0-9a-f]{64}$'
+          description: SHA-256 hex digest of the raw request body bytes.
+        signature:
+          type: string
+          pattern: '^[A-Za-z0-9_-]+$'
+          description: ES256 ECDSA P-256 low-S DER signature base64url unpadded over HKVPN-CHALLENGE-V1 canonical string.
 
     CompleteEnrollmentRequest:
       type: object

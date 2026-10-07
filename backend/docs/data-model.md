@@ -264,7 +264,7 @@ CREATE TABLE refresh_tokens (
     id                          UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
     family_id                   UUID NOT NULL REFERENCES token_families(id) ON DELETE CASCADE,
     token_hash                  CHAR(64) NOT NULL,
-    issuance_operation_id       UUID NOT NULL REFERENCES operations(id) ON DELETE CASCADE,
+    issuance_operation_id       UUID REFERENCES operations(id) ON DELETE SET NULL,
     issuance_client_op_id       UUID NOT NULL,
     issuance_body_hash          CHAR(64) NOT NULL,
     consumed_by_operation_id    UUID REFERENCES operations(id) ON DELETE SET NULL,
@@ -402,7 +402,10 @@ CREATE TABLE credentials (
     id                 UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
     device_id          UUID NOT NULL REFERENCES devices(id) ON DELETE RESTRICT,
     node_id            UUID NOT NULL REFERENCES nodes(id) ON DELETE RESTRICT,
-    uuid               UUID NOT NULL,
+    key_id             VARCHAR(64) NOT NULL DEFAULT 'hkvpn-credential-storage-v1',
+    aead_nonce         BYTEA NOT NULL,
+    aead_ciphertext    BYTEA NOT NULL,
+    fingerprint_sha256 CHAR(64) NOT NULL,
     credential_type    VARCHAR(32) NOT NULL,
     desired_revision   BIGINT NOT NULL DEFAULT 1,
     observed_revision  BIGINT NOT NULL DEFAULT 0,
@@ -411,10 +414,12 @@ CREATE TABLE credentials (
     created_at         TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
     revoked_at         TIMESTAMPTZ,
 
-    CONSTRAINT uq_credentials_node_uuid UNIQUE (node_id, uuid),
+    CONSTRAINT uq_credentials_node_fingerprint UNIQUE (node_id, fingerprint_sha256),
     CONSTRAINT ck_credentials_type CHECK (credential_type IN ('vless', 'relay_password')),
     CONSTRAINT ck_credentials_status CHECK (status IN ('desired', 'applying', 'active', 'revoking', 'revoked', 'expired')),
-    CONSTRAINT ck_credentials_revisions CHECK (desired_revision >= observed_revision AND observed_revision >= 0)
+    CONSTRAINT ck_credentials_revisions CHECK (desired_revision >= observed_revision AND observed_revision >= 0),
+    CONSTRAINT ck_credentials_nonce_len CHECK (octet_length(aead_nonce) = 12),
+    CONSTRAINT ck_credentials_fingerprint_hex CHECK (fingerprint_sha256 ~ '^[0-9a-f]{64}$')
 );
 
 CREATE INDEX idx_credentials_device_status ON credentials (device_id, status);
@@ -422,6 +427,10 @@ CREATE INDEX idx_credentials_node_status ON credentials (node_id, status);
 CREATE INDEX idx_credentials_expires_at ON credentials (expires_at) WHERE status = 'active';
 ```
 
+- **Защита at rest (`aead_ciphertext`, `aead_nonce`, `key_id`)**: персональный VLESS UUID шифруется алгоритмом AES-256-GCM ключом сервиса с `purpose = 'credential_storage'`. Открытый секрет никогда не хранится в БД, журналах или дампах.
+- **Связывание контекста (AAD)**: Authenticated Additional Data жестко связывает шифротекст со средой:
+  `HKVPN-CREDENTIAL-V1\n<credential_id>\n<device_id>\n<node_id>\n<desired_revision>\n<generation>`.
+- **Слепой индекс (`fingerprint_sha256`)**: SHA-256 от сырого секрета используется для проверки уникальности на узле (`uq_credentials_node_fingerprint`) и сопоставления при read-back без раскрытия секрета.
 - **`desired_revision` vs `observed_revision`**: ревизия строго монотонна. `status` переходит в `active` только тогда, когда `observed_revision == desired_revision`.
 - **Лимит аренды (TTL)**: 24 часа (`created_at + INTERVAL '24 hours'`). Плановая ротация инициируется через 12 часов.
 - **Admission Cap**: не более 2 не-revoked записей на устройство одновременно (`status IN ('desired', 'applying', 'active')`).
@@ -494,6 +503,11 @@ CREATE TABLE operations (
     device_id            UUID NOT NULL REFERENCES devices(id) ON DELETE RESTRICT,
     operation_type       VARCHAR(32) NOT NULL,
     client_operation_id  UUID NOT NULL,
+    http_method          VARCHAR(10) NOT NULL,
+    request_path         VARCHAR(255) NOT NULL,
+    request_body_sha256  CHAR(64) NOT NULL,
+    credential_id        UUID REFERENCES credentials(id) ON DELETE SET NULL,
+    profile_id           UUID REFERENCES profiles(id) ON DELETE SET NULL,
     status               VARCHAR(20) NOT NULL DEFAULT 'pending',
     error_code           VARCHAR(64),
     created_at           TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
@@ -501,13 +515,20 @@ CREATE TABLE operations (
 
     CONSTRAINT uq_operations_device_client_op UNIQUE (device_id, client_operation_id),
     CONSTRAINT ck_operations_type CHECK (operation_type IN ('enroll_complete', 'refresh_token', 'reauth_complete', 'issue_profile', 'renew_credential', 'revoke_device')),
-    CONSTRAINT ck_operations_status CHECK (status IN ('pending', 'ready', 'failed'))
+    CONSTRAINT ck_operations_status CHECK (status IN ('pending', 'ready', 'failed')),
+    CONSTRAINT ck_operations_body_hash_hex CHECK (request_body_sha256 ~ '^[0-9a-f]{64}$')
 );
 
 CREATE INDEX idx_operations_status ON operations (status) WHERE status = 'pending';
+CREATE INDEX idx_operations_credential ON operations (credential_id);
 ```
 
-- **Инвариант идемпотентности**: пара `(device_id, client_operation_id)` строго уникальна. Повторный запрос с тем же `clientOperationId` возвращает статус уже существующей операции.
+- **Инвариант идемпотентности**: пара `(device_id, client_operation_id)` строго уникальна (глобальный namespace per-device).
+- **Авторитетная привязка**: операция связывается с `(device_id, client_operation_id, operation_type, http_method, request_path, request_body_sha256)`. Заголовки `X-HKVPN-Timestamp` и `X-HKVPN-Nonce` намеренно исключены из привязки (повторные попытки клиента используют свежий proof).
+- **Классификация повторов**:
+  * Exact retry (совпадение всех полей): возвращает результат существующей операции без повторного выполнения side effects.
+  * Тот же `client_operation_id` с измененным телом, другим типом операции или другим путем: возвращает `409 Conflict`.
+  * Попытка использования ключа другим устройством: отказ авторизации (401/403).
 
 ---
 
@@ -562,7 +583,7 @@ CREATE INDEX idx_outbox_worker_queue
     WHERE status IN ('pending', 'processing');
 ```
 
-- **Содержимое `payload`**: содержит параметры команды к ноде (`credentialId`, `nodeTag`, `inboundTag`, `uuid`, `revision`, `expiresAt`, `idempotencyKey`). Не содержит bearer токенов и секретных ключей.
+- **Содержимое `payload`**: содержит нечувствительные параметры команды к ноде (`credentialId`, `nodeTag`, `inboundTag`, `revision`, `expiresAt`, `idempotencyKey`, `fingerprintSha256`). **Сырой VLESS UUID и секреты авторизации строго исключены из outbox payload!** Доверенный воркер подтягивает запись `credentials` и расшифровывает секрет в эфемерную память непосредственно перед выполнением RPC к ноде.
 
 ---
 
@@ -768,8 +789,8 @@ IF rt.status != 'active' OR rt.expires_at < clock_timestamp() THEN
 END IF;
 
 -- 1. Регистрация операции ротации
-INSERT INTO operations (id, device_id, operation_type, client_operation_id, status)
-VALUES (:new_op_id, tf.device_id, 'refresh_token', :incoming_client_operation_id, 'ready');
+INSERT INTO operations (id, device_id, operation_type, client_operation_id, http_method, request_path, request_body_sha256, status)
+VALUES (:new_op_id, tf.device_id, 'refresh_token', :incoming_client_operation_id, 'POST', '/v1/auth/refresh', :incoming_body_hash, 'ready');
 
 -- 2. Атомарно помечаем старый токен consumed с привязкой к операции потребления
 UPDATE refresh_tokens 
@@ -789,14 +810,9 @@ INSERT INTO access_tokens (family_id, device_id, token_hash, expires_at)
 VALUES (tf.id, tf.device_id, :new_access_token_hash, LEAST(clock_timestamp() + INTERVAL '15 minutes', ag.grant_expires_at));
 
 -- 5. Запись в кэш восстановления ответа (120 секунд)
+-- Выполняется строго ОДИН раз внутри транзакции ротации
 INSERT INTO encrypted_response_cache (device_id, operation_id, token_hash, encrypted_payload, expires_at)
 VALUES (tf.device_id, :new_op_id, :new_refresh_token_hash, :encrypted_payload, clock_timestamp() + INTERVAL '120 seconds');
-
-COMMIT;
-
--- 4. Записываем результат в кэш восстановления (120 секунд)
-INSERT INTO encrypted_response_cache (device_id, operation_id, token_hash, encrypted_payload, expires_at)
-VALUES (tf.device_id, :incoming_client_operation_id, :new_refresh_token_hash, :encrypted_payload, clock_timestamp() + INTERVAL '120 seconds');
 
 COMMIT;
 ```
@@ -837,11 +853,13 @@ COMMIT;
 ```sql
 BEGIN TRANSACTION ISOLATION LEVEL READ COMMITTED;
 
--- 1. Проверяем, не было ли отозвано устройство или учетные данные за время вызова узла
-SELECT c.id, c.desired_revision, c.status, d.status AS device_status, ag.status AS grant_status
+-- 1. Проверяем, не было ли отозвано устройство или учетные данные за время вызова узла,
+-- и проверяем совпадение поколения узла
+SELECT c.id, c.desired_revision, c.status, d.status AS device_status, ag.status AS grant_status, n.generation AS current_node_generation
 FROM credentials c
 JOIN devices d ON d.id = c.device_id
 JOIN access_grants ag ON ag.device_id = d.id AND ag.status = 'active'
+JOIN nodes n ON n.id = c.node_id
 WHERE c.id = :credential_id
 FOR UPDATE OF c;
 
@@ -853,22 +871,49 @@ IF c.status = 'revoking' OR c.status = 'revoked' OR d.device_status != 'active' 
     RETURN;
 END IF;
 
--- 2. CAS обновление ревизии и статуса учетных данных
+-- Проверка поколения узла: если узел перегенерирован/перезапущен, старое доказательство недействительно
+IF current_node_generation != :node_generation THEN
+    UPDATE outbox SET status = 'failed', error_message = 'NODE_GENERATION_MISMATCH' WHERE id = :outbox_id;
+    UPDATE operations SET status = 'failed', error_code = 'NODE_GENERATION_MISMATCH' WHERE id = :operation_id;
+    COMMIT;
+    RETURN;
+END IF;
+
+-- 2. CAS обновление ревизии и статуса учетных данных с RETURNING id
+-- Атомарно проверяет, что desired_revision совпадает с подтвержденной ревизией
 UPDATE credentials 
 SET observed_revision = :response_observed_revision,
-    status = 'active'
-WHERE id = :credential_id AND desired_revision = :response_observed_revision;
+    status = 'active',
+    updated_at = clock_timestamp()
+WHERE id = :credential_id 
+  AND desired_revision = :response_observed_revision
+  AND node_id = :node_id
+RETURNING id INTO updated_id;
 
--- 3. Сохранение сырого доказательства наблюдения
+-- КРИТИЧЕСКАЯ ПРОВЕРКА CAS: если updated_id IS NULL (rows_updated == 0),
+-- значит произошел race condition (например, ревизия устарела или изменилась).
+-- В этом случае ЗАПРЕЩЕНО создавать запись в profiles и переводить операцию в ready!
+IF updated_id IS NULL THEN
+    UPDATE outbox SET status = 'failed', error_message = 'CAS_REVISION_MISMATCH' WHERE id = :outbox_id;
+    UPDATE operations SET status = 'failed', error_code = 'PROVISIONING_CAS_FAILED' WHERE id = :operation_id;
+    COMMIT;
+    RETURN;
+END IF;
+
+-- 3. Сохранение сырого доказательства наблюдения (строго привязано к generation и node_id)
 INSERT INTO node_observations (node_id, generation, raw_evidence)
 VALUES (:node_id, :node_generation, :evidence_jsonb);
 
 -- 4. Генерация зашифрованного конверта профиля и пометка операции 'ready'
+-- Выполняется СТРОГО ПОСЛЕ успешного CAS!
 INSERT INTO profiles (device_id, revision, envelope_ciphertext)
-VALUES (:device_id, :response_observed_revision, :encrypted_profile_envelope);
+VALUES (:device_id, :response_observed_revision, :encrypted_profile_envelope)
+ON CONFLICT (device_id, revision) DO UPDATE 
+SET envelope_ciphertext = EXCLUDED.envelope_ciphertext
+RETURNING id INTO new_profile_id;
 
 UPDATE operations 
-SET status = 'ready', updated_at = clock_timestamp()
+SET status = 'ready', profile_id = new_profile_id, updated_at = clock_timestamp()
 WHERE id = :operation_id;
 
 -- 5. Пометка задачи outbox как успешно завершенной
@@ -888,11 +933,11 @@ COMMIT;
 | `devices` | **Soft Deletion** | Пожизненно (аудит) | `status = 'revoked'`, `spki_der` и `fingerprint` сохраняются для защиты от перерегистрации |
 | `access_grants` | **Soft Deletion** | Пожизненно | `status = 'revoked'`, `revoked_at` |
 | `token_families` | **Soft Deletion** | Пожизненно | `status = 'revoked'`, `revoked_at` |
-| `refresh_tokens` | **Hard Deletion** | 30 дней после истечения семьи | Bounded batch purge: `DELETE FROM refresh_tokens WHERE expires_at < now() - INTERVAL '30 days'` |
-| `access_tokens` | **Hard Deletion** | 24 часа после истечения токена | Bounded batch purge: `DELETE FROM access_tokens WHERE expires_at < now() - INTERVAL '24 hours'` |
-| `request_nonces` | **Hard Deletion** | 5 минут | Bounded batch purge (каждую минуту): `DELETE FROM request_nonces WHERE seen_at < now() - INTERVAL '5 minutes' LIMIT 5000` |
-| `challenges` | **Hard Deletion** | 48 часов после истечения | Bounded batch purge: `DELETE FROM challenges WHERE expires_at < now() - INTERVAL '48 hours' LIMIT 1000` |
-| `encrypted_response_cache` | **Hard Deletion** | 120 секунд | Bounded batch purge (каждые 30 секунд): `DELETE FROM encrypted_response_cache WHERE expires_at < now() LIMIT 1000` |
+| `refresh_tokens` | **Hard Deletion** | 30 дней после истечения семьи | Bounded batch purge: `DELETE FROM refresh_tokens WHERE id IN (SELECT id FROM refresh_tokens WHERE expires_at < now() - INTERVAL '30 days' LIMIT 5000)` |
+| `access_tokens` | **Hard Deletion** | 24 часа после истечения токена | Bounded batch purge: `DELETE FROM access_tokens WHERE id IN (SELECT id FROM access_tokens WHERE expires_at < now() - INTERVAL '24 hours' LIMIT 5000)` |
+| `request_nonces` | **Hard Deletion** | 5 минут | Bounded batch purge (каждую минуту): `DELETE FROM request_nonces WHERE id IN (SELECT id FROM request_nonces WHERE seen_at < now() - INTERVAL '5 minutes' LIMIT 5000)` |
+| `challenges` | **Hard Deletion** | 48 часов после истечения | Bounded batch purge: `DELETE FROM challenges WHERE id IN (SELECT id FROM challenges WHERE expires_at < now() - INTERVAL '48 hours' LIMIT 1000)` |
+| `encrypted_response_cache` | **Hard Deletion** | 120 секунд | Bounded batch purge (каждые 30 секунд): `DELETE FROM encrypted_response_cache WHERE id IN (SELECT id FROM encrypted_response_cache WHERE expires_at < now() LIMIT 1000)` |
 | `leases` | **Tombstone -> Purge** | 24ч аренда + **48ч retention grace** | Tombstone удерживает IP до `purge_after = expires_at + 48h`. Удаление строго после наступления `purge_after` |
 | `credentials` | **Soft Deletion** | До истечения + 7 дней | `status = 'revoked'` или `'expired'`. Удаление старых версий только после успешной ротации |
 | `operations` | **Hard Deletion** | 48 часов | Хранение идемпотентного статуса 48 часов, затем удаление завершенных операций |
